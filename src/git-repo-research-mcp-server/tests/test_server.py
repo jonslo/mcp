@@ -188,7 +188,8 @@ async def test_mcp_index_repository(test_context, test_git_repo, monkeypatch):
         # Configure the mock
         mock_embeddings = MagicMock()
         mock_embeddings.embed_query.return_value = [0.1] * 1536
-        mock_embeddings.embed_documents.return_value = [[0.1] * 1536] * 10
+        # Make the mock return embeddings dynamically based on input length
+        mock_embeddings.embed_documents.side_effect = lambda docs: [[0.1] * 1536 for _ in docs]
         mock_bedrock.return_value = mock_embeddings
 
         # Use a unique name for the repository
