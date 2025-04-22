@@ -390,8 +390,10 @@ class RepositoryIndexer:
 
             # Determine the output path
             if output_path:
-                index_path = output_path
-                os.makedirs(os.path.dirname(index_path), exist_ok=True)
+                # Use output_path as the repository name and get the index path
+                index_path = self._get_index_path(output_path)
+                # Ensure the directory exists
+                os.makedirs(index_path, exist_ok=True)
             else:
                 index_path = self._get_index_path(repository_name)
 
@@ -539,8 +541,11 @@ class RepositoryIndexer:
                 ctx.info('Finalizing index metadata...')
                 ctx.report_progress(90, 100)  # 90% progress - creating metadata
 
+            # Use output_path as repository_name if provided
+            final_repo_name = output_path if output_path else repository_name
+
             metadata = IndexMetadata(
-                repository_name=repository_name,
+                repository_name=final_repo_name,
                 repository_path=repository_path,
                 index_path=index_path,
                 created_at=datetime.now(),
@@ -593,7 +598,7 @@ class RepositoryIndexer:
 
             return IndexRepositoryResponse(
                 status='success',
-                repository_name=repository_name,
+                repository_name=final_repo_name,
                 repository_path=repository_path,
                 index_path=index_path,
                 repository_directory=repo_files_path,

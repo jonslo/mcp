@@ -13,20 +13,17 @@
 import os
 import pytest
 import requests
-import time
-from unittest.mock import MagicMock, patch
-
 from awslabs.git_repo_research_mcp_server.github_search import (
     github_graphql_request,
     github_repo_search_graphql,
     github_repo_search_rest,
     github_repo_search_wrapper,
 )
+from unittest.mock import MagicMock, patch
 
 
 def test_github_graphql_request_rate_limit_no_token():
     """Test GitHub GraphQL request function with rate limiting and no token."""
-    
     with patch('requests.post') as mock_post:
         # Configure the mock for rate limit response with no token
         rate_limit_response = MagicMock()
@@ -41,76 +38,75 @@ def test_github_graphql_request_rate_limit_no_token():
 
         # Verify the result - should return empty response without waiting
         assert result == {'data': {'search': {'edges': []}}}
-        
+
         # Verify post was called once
         mock_post.assert_called_once()
 
 
 def test_github_graphql_request_http_error():
     """Test GitHub GraphQL request function with HTTP error."""
-    
     with patch('requests.post') as mock_post:
         # Configure the mock to raise an HTTP error
-        mock_post.side_effect = requests.exceptions.HTTPError("404 Client Error")
+        mock_post.side_effect = requests.exceptions.HTTPError('404 Client Error')
 
         # Call the function and expect it to raise the exception after retries
         with pytest.raises(requests.exceptions.HTTPError):
             github_graphql_request(
-                query='test query', variables={'query': 'test', 'numResults': 2}, token='test_token'
+                query='test query',
+                variables={'query': 'test', 'numResults': 2},
+                token='test_token',
             )
 
 
 def test_github_graphql_request_auth_failure():
     """Test GitHub GraphQL request function with authentication failure."""
-    
     with patch('requests.post') as mock_post:
         # Configure the mock for auth failure response
         auth_failure = MagicMock()
         auth_failure.status_code = 401
         auth_failure.raise_for_status.side_effect = requests.exceptions.HTTPError(
-            "401 Client Error: Unauthorized"
+            '401 Client Error: Unauthorized'
         )
         auth_failure.response = auth_failure
         mock_post.side_effect = requests.exceptions.HTTPError(
-            "401 Client Error: Unauthorized", response=auth_failure
+            '401 Client Error: Unauthorized', response=auth_failure
         )
 
         # Call the function and expect it to raise the exception without retries
         with pytest.raises(requests.exceptions.HTTPError):
             github_graphql_request(
-                query='test query', variables={'query': 'test', 'numResults': 2}, token='invalid_token'
+                query='test query',
+                variables={'query': 'test', 'numResults': 2},
+                token='invalid_token',
             )
-        
+
         # Verify post was called only once (no retries)
         mock_post.assert_called_once()
 
 
 def test_github_graphql_request_connection_error():
     """Test GitHub GraphQL request function with connection error."""
-    
     with patch('requests.post') as mock_post:
         # Configure the mock to raise a connection error
-        mock_post.side_effect = requests.exceptions.ConnectionError("Connection refused")
+        mock_post.side_effect = requests.exceptions.ConnectionError('Connection refused')
 
         # Call the function and expect it to raise the exception after retries
         with pytest.raises(requests.exceptions.ConnectionError):
             github_graphql_request(
-                query='test query', variables={'query': 'test', 'numResults': 2}, token='test_token'
+                query='test query',
+                variables={'query': 'test', 'numResults': 2},
+                token='test_token',
             )
 
 
 def test_github_repo_search_graphql_with_errors():
     """Test GitHub repository search with GraphQL API errors."""
-    
     with patch(
         'awslabs.git_repo_research_mcp_server.github_search.github_graphql_request'
     ) as mock_request:
         # Configure the mock to return an error response
         mock_request.return_value = {
-            'errors': [
-                {'message': 'Something went wrong'},
-                {'message': 'Another error occurred'}
-            ]
+            'errors': [{'message': 'Something went wrong'}, {'message': 'Another error occurred'}]
         }
 
         # Call the function
@@ -131,12 +127,12 @@ def test_github_repo_search_graphql_with_exception():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with patch(
         'awslabs.git_repo_research_mcp_server.github_search.github_graphql_request'
     ) as mock_request:
         # Configure the mock to raise an exception
-        mock_request.side_effect = Exception("Test exception")
+        mock_request.side_effect = Exception('Test exception')
 
         # Call the function
         results = github_repo_search_graphql(
@@ -156,7 +152,7 @@ def test_github_repo_search_graphql_duplicate_urls():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with patch(
         'awslabs.git_repo_research_mcp_server.github_search.github_graphql_request'
     ) as mock_request:
@@ -177,7 +173,10 @@ def test_github_repo_search_graphql_duplicate_urls():
                                 'updatedAt': '2023-01-01T00:00:00Z',
                                 'primaryLanguage': {'name': 'Python'},
                                 'repositoryTopics': {
-                                    'nodes': [{'topic': {'name': 'llm'}}, {'topic': {'name': 'ai'}}]
+                                    'nodes': [
+                                        {'topic': {'name': 'llm'}},
+                                        {'topic': {'name': 'ai'}},
+                                    ]
                                 },
                                 'licenseInfo': {'name': 'Apache License 2.0'},
                                 'forkCount': 20,
@@ -196,7 +195,10 @@ def test_github_repo_search_graphql_duplicate_urls():
                                 'updatedAt': '2023-01-01T00:00:00Z',
                                 'primaryLanguage': {'name': 'Python'},
                                 'repositoryTopics': {
-                                    'nodes': [{'topic': {'name': 'llm'}}, {'topic': {'name': 'ai'}}]
+                                    'nodes': [
+                                        {'topic': {'name': 'llm'}},
+                                        {'topic': {'name': 'ai'}},
+                                    ]
                                 },
                                 'licenseInfo': {'name': 'Apache License 2.0'},
                                 'forkCount': 20,
@@ -228,7 +230,7 @@ def test_github_repo_search_graphql_org_mismatch():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with patch(
         'awslabs.git_repo_research_mcp_server.github_search.github_graphql_request'
     ) as mock_request:
@@ -278,10 +280,10 @@ def test_github_repo_search_rest_with_exception():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with patch('requests.get') as mock_get:
         # Configure the mock to raise an exception
-        mock_get.side_effect = Exception("Test exception")
+        mock_get.side_effect = Exception('Test exception')
 
         # Call the function
         results = github_repo_search_rest(
@@ -300,10 +302,10 @@ def test_github_repo_search_rest_with_http_error():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with patch('requests.get') as mock_get:
         # Configure the mock to raise an HTTP error
-        mock_get.side_effect = requests.exceptions.HTTPError("404 Client Error")
+        mock_get.side_effect = requests.exceptions.HTTPError('404 Client Error')
 
         # Call the function
         results = github_repo_search_rest(
@@ -322,7 +324,7 @@ def test_github_repo_search_rest_with_duplicate_urls():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with patch('requests.get') as mock_get:
         # Configure the mock to return duplicate URLs across different orgs
         mock_response1 = MagicMock()
@@ -344,7 +346,7 @@ def test_github_repo_search_rest_with_duplicate_urls():
             ]
         }
         mock_response1.status_code = 200
-        
+
         mock_response2 = MagicMock()
         mock_response2.json.return_value = {
             'items': [
@@ -364,7 +366,7 @@ def test_github_repo_search_rest_with_duplicate_urls():
             ]
         }
         mock_response2.status_code = 200
-        
+
         # Return different responses for different organizations
         mock_get.side_effect = [mock_response1, mock_response2]
 
@@ -386,7 +388,7 @@ def test_github_repo_search_rest_with_license_filter():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with patch('requests.get') as mock_get:
         # Configure the mock to return repos with different licenses
         mock_response = MagicMock()
@@ -417,7 +419,7 @@ def test_github_repo_search_rest_with_license_filter():
                     'forks_count': 50,
                     'open_issues_count': 10,
                     'homepage': None,
-                }
+                },
             ]
         }
         mock_response.status_code = 200
@@ -443,7 +445,7 @@ def test_github_repo_search_wrapper_with_string_keywords():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with (
         patch('os.environ.get') as mock_env,
         patch(
@@ -490,7 +492,7 @@ def test_github_repo_search_wrapper_with_args():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with (
         patch('os.environ.get') as mock_env,
         patch(
@@ -537,7 +539,7 @@ def test_github_repo_search_wrapper_with_generic_kwargs():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with (
         patch('os.environ.get') as mock_env,
         patch(
@@ -583,7 +585,7 @@ def test_github_repo_search_wrapper_exception():
     # Skip in CI environment
     if os.environ.get('CI') == 'true':
         pytest.skip('Skipping GitHub API test in CI environment')
-    
+
     with (
         patch('os.environ.get') as mock_env,
         patch(
@@ -592,7 +594,7 @@ def test_github_repo_search_wrapper_exception():
     ):
         # Configure the mocks
         mock_env.return_value = None  # No token
-        mock_rest.side_effect = Exception("Test exception")
+        mock_rest.side_effect = Exception('Test exception')
 
         # Call the function
         results = github_repo_search_wrapper(keywords=['mcp', 'aws'])

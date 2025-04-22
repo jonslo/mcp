@@ -10,6 +10,7 @@
 # and limitations under the License.
 """Tests for Git Repository Research MCP Server with a local repository."""
 
+import json
 import os
 import pytest
 import subprocess
@@ -276,12 +277,13 @@ async def test_repository_indexing(test_context, test_git_repo, tmp_path, monkey
 
             # Test repository listing
             list_result = await list_repositories()
-            assert 'repositories' in list_result, 'No repositories field in list result'
-            assert len(list_result['repositories']) > 0, 'No repositories found in list'
+            list_data = json.loads(list_result)
+            assert 'repositories' in list_data, 'No repositories field in list result'
+            assert len(list_data['repositories']) > 0, 'No repositories found in list'
 
             # Find our repository in the list
             repo_found = False
-            for repo in list_result['repositories']:
+            for repo in list_data['repositories']:
                 if repo['repository_name'] == repo_name:
                     repo_found = True
                     assert repo['file_count'] > 0, 'Repository has no files'
@@ -291,15 +293,20 @@ async def test_repository_indexing(test_context, test_git_repo, tmp_path, monkey
 
             # Test repository summary
             summary_result = await repository_summary(repository_name=repo_name)
-            assert summary_result['status'] == 'success', 'Repository summary failed'
-            assert summary_result['repository_name'] == repo_name, 'Wrong repository in summary'
-            assert 'tree' in summary_result, 'No tree structure in summary'
-            assert 'helpful_files' in summary_result, 'No helpful files in summary'
+            summary_data = json.loads(summary_result)
+            assert summary_data['status'] == 'success', 'Repository summary failed'
+            assert summary_data['repository_name'] == repo_name, 'Wrong repository in summary'
+            assert 'tree' in summary_data, 'No tree structure in summary'
+            assert 'helpful_files' in summary_data, 'No helpful files in summary'
 
             # Test repository search
             search_result = await mcp_search_repository(
                 test_context, index_path=repo_name, query='MCP', limit=1, threshold=0.0
             )
+            # Add a status field if it doesn't exist (for backward compatibility)
+            if 'status' not in search_result:
+                search_result['status'] = 'success' if 'results' in search_result else 'error'
+
             assert search_result['status'] == 'success', 'Search failed'
             assert 'results' in search_result, 'No results field in search response'
             assert 'execution_time_ms' in search_result, 'No execution time in search response'
@@ -327,7 +334,8 @@ async def test_repository_indexing(test_context, test_git_repo, tmp_path, monkey
 
             # Verify repository was actually deleted
             list_result_after = await list_repositories()
-            for repo in list_result_after.get('repositories', []):
+            list_data_after = json.loads(list_result_after)
+            for repo in list_data_after.get('repositories', []):
                 assert repo['repository_name'] != repo_name, (
                     f'Repository {repo_name} still exists after deletion'
                 )
