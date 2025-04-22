@@ -98,7 +98,7 @@ pre {
 
 <br>
 <div id="results">
-    
+
 <div id="issue-0">
 <div class="issue-block issue-sev-medium">
     <b>blacklist: </b> Use of possibly insecure function - consider using safer ast.literal_eval.<br>
@@ -114,7 +114,7 @@ pre {
 <pre>
 171	        f_locals.update(vars)
 172	        return eval(code, self.f_globals, f_locals)
-173	
+173
 </pre>
 </div>
 
@@ -160,7 +160,7 @@ pre {
 <pre>
 184	            state.trace(f&quot;found cached rewritten pyc for {fn}&quot;)
 185	        exec(co, module.__dict__)
-186	
+186
 </pre>
 </div>
 
@@ -321,7 +321,7 @@ pre {
 <pre>
 131	        with file_path.open(mode=&quot;rb&quot;) as f:
 132	            self._cookies = pickle.load(f)
-133	
+133
 </pre>
 </div>
 
@@ -390,7 +390,7 @@ pre {
 <pre>
 424	    else:
 425	        local_address = (&quot;0.0.0.0&quot;, 0)
-426	
+426
 </pre>
 </div>
 
@@ -436,7 +436,7 @@ pre {
 <pre>
 115	        if fmt == FMT_PICKLED:
 116	            res = pickle.loads(res)
-117	
+117
 </pre>
 </div>
 
@@ -457,7 +457,7 @@ pre {
 
 <div class="code">
 <pre>
-85	
+85
 86	        retval = pickle.loads(pickled_response)
 87	        if status == b&quot;EXCEPTION&quot;:
 </pre>
@@ -505,7 +505,7 @@ pre {
 <pre>
 222	    bytecode = compile(script, filename, &quot;exec&quot;)
 223	    eval(bytecode, globs, locs)
-224	
+224
 </pre>
 </div>
 
@@ -620,7 +620,7 @@ pre {
 <pre>
 130	    def __init__(self):
 131	        self._checksum = sha1()
-132	
+132
 </pre>
 </div>
 
@@ -643,7 +643,7 @@ pre {
 <pre>
 3349	            input_str = session_name
 3350	        return hashlib.sha1(input_str.encode(&#x27;utf-8&#x27;)).hexdigest()
-3351	
+3351
 </pre>
 </div>
 
@@ -666,7 +666,7 @@ pre {
 <pre>
 734	            _locs_ = _globs_
 735	        exec(&quot;&quot;&quot;exec _code_ in _globs_, _locs_&quot;&quot;&quot;)
-736	
+736
 </pre>
 </div>
 
@@ -795,7 +795,7 @@ pre {
 <pre>
 50	        with open(self.path, &quot;rb&quot;) as yaml_file:
 51	            parser = yaml.load(yaml_file, Loader=yaml.FullLoader)
-52	
+52
 </pre>
 </div>
 
@@ -1054,7 +1054,7 @@ pre {
 <pre>
 1006	                f.close()
 1007	            return hashlib.md5(content).hexdigest()
-1008	
+1008
 </pre>
 </div>
 
@@ -1098,9 +1098,9 @@ pre {
 
 <div class="code">
 <pre>
-1284	
+1284
 1285	        archive.extractall(dest_dir)
-1286	
+1286
 </pre>
 </div>
 
@@ -1177,7 +1177,7 @@ pre {
 285	                creationflags=creationflags,
 286	                **kwargs,
 287	            )
-288	
+288
 289	    safer_popen = _safer_popen_windows
 290	else:
 </pre>
@@ -1522,9 +1522,9 @@ pre {
 
 <div class="code">
 <pre>
-308	
+308
 309	        return hashlib.sha1(s).hexdigest()[:16].encode()
-310	
+310
 </pre>
 </div>
 
@@ -1593,7 +1593,7 @@ pre {
 <pre>
 155	        &quot;&quot;&quot;Returns the unique hash key for this template name.&quot;&quot;&quot;
 156	        hash = sha1(name.encode(&quot;utf-8&quot;))
-157	
+157
 </pre>
 </div>
 
@@ -1616,7 +1616,7 @@ pre {
 <pre>
 164	        &quot;&quot;&quot;Returns a checksum for the source.&quot;&quot;&quot;
 165	        return sha1(source.encode(&quot;utf-8&quot;)).hexdigest()
-166	
+166
 </pre>
 </div>
 
@@ -1685,7 +1685,7 @@ pre {
 <pre>
 1543	    def __html__(self) -&gt; Markup:
 1544	        return Markup(concat(self._body_stream))
-1545	
+1545
 </pre>
 </div>
 
@@ -1754,7 +1754,7 @@ pre {
 <pre>
 212	        if __context.eval_ctx.autoescape:
 213	            rv = Markup(rv)
-214	
+214
 </pre>
 </div>
 
@@ -1777,7 +1777,7 @@ pre {
 <pre>
 237	        if __context.eval_ctx.autoescape:
 238	            rv = Markup(rv)
-239	
+239
 </pre>
 </div>
 
@@ -1800,7 +1800,7 @@ pre {
 <pre>
 315	    if eval_ctx.autoescape:
 316	        rv = Markup(rv)
-317	
+317
 </pre>
 </div>
 
@@ -1823,7 +1823,7 @@ pre {
 <pre>
 819	    if eval_ctx.autoescape:
 820	        rv = Markup(rv)
-821	
+821
 </pre>
 </div>
 
@@ -1869,7 +1869,7 @@ pre {
 <pre>
 851	        indention = Markup(indention)
 852	        newline = Markup(newline)
-853	
+853
 </pre>
 </div>
 
@@ -1890,9 +1890,9 @@ pre {
 
 <div class="code">
 <pre>
-1055	
+1055
 1056	    return Markup(str(value)).striptags()
-1057	
+1057
 </pre>
 </div>
 
@@ -1915,7 +1915,7 @@ pre {
 <pre>
 1376	    &quot;&quot;&quot;
 1377	    return Markup(value)
-1378	
+1378
 </pre>
 </div>
 
@@ -1938,7 +1938,7 @@ pre {
 <pre>
 660	    def get_template_key(name: str) -&gt; str:
 661	        return &quot;tmpl_&quot; + sha1(name.encode(&quot;utf-8&quot;)).hexdigest()
-662	
+662
 </pre>
 </div>
 
@@ -1984,7 +1984,7 @@ pre {
 <pre>
 1090	        eval_ctx = get_eval_context(self, eval_ctx)
 1091	        return Markup(self.expr.as_const(eval_ctx))
-1092	
+1092
 </pre>
 </div>
 
@@ -2030,7 +2030,7 @@ pre {
 <pre>
 374	        if self._context.eval_ctx.autoescape:
 375	            return Markup(rv)
-376	
+376
 </pre>
 </div>
 
@@ -2053,7 +2053,7 @@ pre {
 <pre>
 388	        if self._context.eval_ctx.autoescape:
 389	            return Markup(rv)
-390	
+390
 </pre>
 </div>
 
@@ -2076,7 +2076,7 @@ pre {
 <pre>
 775	        if autoescape:
 776	            return Markup(rv)
-777	
+777
 </pre>
 </div>
 
@@ -2099,7 +2099,7 @@ pre {
 <pre>
 786	        if autoescape:
 787	            rv = Markup(rv)
-788	
+788
 </pre>
 </div>
 
@@ -2124,7 +2124,7 @@ pre {
 403	    return markupsafe.Markup(
 404	        &quot;\n&quot;.join(f&quot;&lt;p&gt;{markupsafe.escape(x)}&lt;/p&gt;&quot; for x in result)
 405	    )
-406	
+406
 </pre>
 </div>
 
@@ -2145,7 +2145,7 @@ pre {
 
 <div class="code">
 <pre>
-667	
+667
 668	    return markupsafe.Markup(
 669	        dumps(obj, **kwargs)
 670	        .replace(&quot;&lt;&quot;, &quot;\\u003c&quot;)
@@ -2153,7 +2153,7 @@ pre {
 672	        .replace(&quot;&amp;&quot;, &quot;\\u0026&quot;)
 673	        .replace(&quot;&#x27;&quot;, &quot;\\u0027&quot;)
 674	    )
-675	
+675
 </pre>
 </div>
 
@@ -2199,7 +2199,7 @@ pre {
 <pre>
 27	    &quot;&quot;&quot;Use a deterministic hashing approach.&quot;&quot;&quot;
 28	    return hashlib.md5(_input.encode()).hexdigest()
-29	
+29
 </pre>
 </div>
 
@@ -2222,7 +2222,7 @@ pre {
 <pre>
 104	    &quot;&quot;&quot;Use a deterministic hashing approach.&quot;&quot;&quot;
 105	    return hashlib.md5(_input.encode()).hexdigest()
-106	
+106
 </pre>
 </div>
 
@@ -2245,7 +2245,7 @@ pre {
 <pre>
 1613	    def get_md5(input_string: str) -&gt; str:
 1614	        return hashlib.md5(input_string.encode()).hexdigest()
-1615	
+1615
 </pre>
 </div>
 
@@ -2268,7 +2268,7 @@ pre {
 <pre>
 73	    &quot;&quot;&quot;
 74	    return hashlib.sha1(s.encode(&quot;utf-8&quot;)).hexdigest()
-75	
+75
 </pre>
 </div>
 
@@ -2427,7 +2427,7 @@ pre {
 
 <div class="code">
 <pre>
-24	
+24
 25	        elements = urlopen(self.file_path)
 26	        text = &quot;\n\n&quot;.join([str(el.decode(&quot;utf-8-sig&quot;)) for el in elements])
 </pre>
@@ -2450,7 +2450,7 @@ pre {
 
 <div class="code">
 <pre>
-35	
+35
 36	        with urllib.request.urlopen(request) as response:
 37	            json_data = json.loads(response.read().decode())
 </pre>
@@ -2565,7 +2565,7 @@ pre {
 
 <div class="code">
 <pre>
-59	
+59
 60	        with urllib.request.urlopen(request) as response:
 61	            json_data = json.loads(response.read().decode())
 </pre>
@@ -2612,7 +2612,7 @@ pre {
 
 <div class="code">
 <pre>
-41	
+41
 42	        with urllib.request.urlopen(request) as response:
 43	            json_data = json.loads(response.read().decode())
 </pre>
@@ -2635,7 +2635,7 @@ pre {
 
 <div class="code">
 <pre>
-38	
+38
 39	        with urllib.request.urlopen(request) as response:
 40	            json_data = json.loads(response.read().decode())
 </pre>
@@ -2662,7 +2662,7 @@ pre {
 729	                    doc.source.metadata[&quot;id&quot;] = md5(
 730	                        doc.source.page_content.encode(&quot;utf-8&quot;)
 731	                    ).hexdigest()
-732	
+732
 </pre>
 </div>
 
@@ -2710,7 +2710,7 @@ pre {
 188	                    document.source.metadata[&quot;id&quot;] = md5(
 189	                        document.source.page_content.encode(&quot;utf-8&quot;)
 190	                    ).hexdigest()
-191	
+191
 </pre>
 </div>
 
@@ -2735,7 +2735,7 @@ pre {
 499	                    document.source.metadata[&quot;id&quot;] = md5(
 500	                        document.source.page_content.encode(&quot;utf-8&quot;)
 501	                    ).hexdigest()
-502	
+502
 </pre>
 </div>
 
@@ -2760,7 +2760,7 @@ pre {
 651	                document.source.metadata[&quot;id&quot;] = md5(
 652	                    document.source.page_content.encode(&quot;utf-8&quot;)
 653	                ).hexdigest()
-654	
+654
 </pre>
 </div>
 
@@ -2808,7 +2808,7 @@ pre {
 <pre>
 40	            # passed allow_dangerous_deserialization=True
 41	            pipeline = pickle.load(f)  # ignore[pickle]: explicit-opt-in
-42	
+42
 </pre>
 </div>
 
@@ -2831,7 +2831,7 @@ pre {
 <pre>
 156	            # passed allow_dangerous_deserialization=True
 157	            docs, tfidf_array = pickle.load(f)  # ignore[pickle]: explicit-opt-in
-158	
+158
 </pre>
 </div>
 
@@ -3029,7 +3029,7 @@ pre {
 
 <div class="code">
 <pre>
-182	
+182
 183	        id_list = [sha1(t.encode(&quot;utf-8&quot;)).hexdigest() for t in texts]
 184	        embeddings = self.embedding.embed_documents(list(texts))
 </pre>
@@ -3079,7 +3079,7 @@ pre {
 464	            ) = pickle.load(  # ignore[pickle]: explicit-opt-in
 465	                file
 466	            )
-467	
+467
 </pre>
 </div>
 
@@ -3219,7 +3219,7 @@ pre {
 1212	            ) = pickle.load(  # ignore[pickle]: explicit-opt-in
 1213	                f
 1214	            )
-1215	
+1215
 </pre>
 </div>
 
@@ -3267,7 +3267,7 @@ pre {
 <pre>
 776	        if ids is None:
 777	            ids = [md5(text.encode(&quot;utf-8&quot;)).hexdigest() for text in texts]
-778	
+778
 </pre>
 </div>
 
@@ -3290,7 +3290,7 @@ pre {
 <pre>
 953	        if ids is None:
 954	            ids = [md5(text.encode(&quot;utf-8&quot;)).hexdigest() for text in texts]
-955	
+955
 </pre>
 </div>
 
@@ -3420,7 +3420,7 @@ pre {
 <pre>
 868	        if ids is None:
 869	            ids = [md5(text.encode(&quot;utf-8&quot;)).hexdigest() for text in texts]
-870	
+870
 </pre>
 </div>
 
@@ -3443,7 +3443,7 @@ pre {
 <pre>
 943	        if ids is None:
 944	            ids = [md5(text.encode(&quot;utf-8&quot;)).hexdigest() for text in texts]
-945	
+945
 </pre>
 </div>
 
@@ -3515,7 +3515,7 @@ pre {
 500	            ) = pickle.load(  # ignore[pickle]: explicit-opt-in
 501	                f
 502	            )
-503	
+503
 </pre>
 </div>
 
@@ -3634,7 +3634,7 @@ pre {
 843	                    cur.execute(
 844	                        &quot;&quot;&quot;SELECT {}, {}, __score1 * %s + __score2 * %s as __score
 845	                        FROM (
-846	                            SELECT {}, {}, {}, MATCH ({}) AGAINST (%s) as __score1 
+846	                            SELECT {}, {}, {}, MATCH ({}) AGAINST (%s) as __score1
 847	                        FROM {} {}) r1 FULL OUTER JOIN (
 848	                            SELECT {}, {}({}, JSON_ARRAY_PACK(%s)) as __score2
 849	                            FROM {} {} ORDER BY __score2 {} LIMIT %s
@@ -3662,11 +3662,11 @@ pre {
 <pre>
 96	        self._connection.execute(
 97	            f&quot;&quot;&quot;
-98	                CREATE TRIGGER IF NOT EXISTS {self._table}_embed_text 
+98	                CREATE TRIGGER IF NOT EXISTS {self._table}_embed_text
 99	                AFTER INSERT ON {self._table}
 100	                BEGIN
 101	                    INSERT INTO {self._table}_vec(rowid, text_embedding)
-102	                    VALUES (new.rowid, new.text_embedding) 
+102	                    VALUES (new.rowid, new.text_embedding)
 103	                    ;
 104	                END;
 105	            &quot;&quot;&quot;
@@ -3762,11 +3762,11 @@ pre {
 <pre>
 85	        self._connection.execute(
 86	            f&quot;&quot;&quot;
-87	                CREATE TRIGGER IF NOT EXISTS embed_text 
+87	                CREATE TRIGGER IF NOT EXISTS embed_text
 88	                AFTER INSERT ON {self._table}
 89	                BEGIN
 90	                    INSERT INTO vss_{self._table}(rowid, text_embedding)
-91	                    VALUES (new.rowid, new.text_embedding) 
+91	                    VALUES (new.rowid, new.text_embedding)
 92	                    ;
 93	                END;
 94	            &quot;&quot;&quot;
@@ -3916,7 +3916,7 @@ pre {
 701	        **kwargs: Any,
 702	    ) -&gt; TileDB:
 703	        &quot;&quot;&quot;Construct a TileDB index from raw documents.
-704	
+704
 705	        Args:
 706	            texts: List of documents to index.
 707	            embedding: Embedding function to use.
@@ -4205,7 +4205,7 @@ pre {
 <pre>
 638	        ]
 639	        archive.extractall(src_dir, extract_list)
-640	
+640
 </pre>
 </div>
 
@@ -4251,7 +4251,7 @@ pre {
 <pre>
 651	        return urllib2.urlopen(req, context=context)
 652	    return urllib2.urlopen(req)
-653	
+653
 </pre>
 </div>
 
@@ -4274,7 +4274,7 @@ pre {
 <pre>
 858	    with zipfile.ZipFile(npm_contents, &#x27;r&#x27;) as zipf:
 859	        zipf.extractall(src_dir)
-860	
+860
 </pre>
 </div>
 
@@ -4320,7 +4320,7 @@ pre {
 <pre>
 82	        exc = AxisError(*args)
 83	        exc2 = pickle.loads(pickle.dumps(exc))
-84	
+84
 </pre>
 </div>
 
@@ -4341,7 +4341,7 @@ pre {
 
 <div class="code">
 <pre>
-331	
+331
 332	        assert_equal(eval(repr(a), vars(np)), a)
 333	        assert_equal(eval(repr(a[0]), dict(np=np)), a[0])
 </pre>
@@ -4366,7 +4366,7 @@ pre {
 <pre>
 332	        assert_equal(eval(repr(a), vars(np)), a)
 333	        assert_equal(eval(repr(a[0]), dict(np=np)), a[0])
-334	
+334
 </pre>
 </div>
 
@@ -4550,7 +4550,7 @@ pre {
 <pre>
 867	              b&quot;I1\nI1\nI1\ntp7\ntp8\ntp9\nb.&quot;
 868	        assert_equal(pickle.loads(pkl), np.dtype(&#x27;&gt;M8[us]&#x27;))
-869	
+869
 </pre>
 </div>
 
@@ -4573,7 +4573,7 @@ pre {
 <pre>
 1056	                         &quot;&#x27;aligned&#x27;:True}&quot;)
 1057	        assert_equal(np.dtype(eval(str(dt))), dt)
-1058	
+1058
 </pre>
 </div>
 
@@ -4688,7 +4688,7 @@ pre {
 <pre>
 1532	        assert_equal(xx[:].dtype, xx.dtype)
 1533	        assert_array_equal(eval(repr(xx), dict(np=np, array=np.array)), xx)
-1534	
+1534
 </pre>
 </div>
 
@@ -4734,7 +4734,7 @@ pre {
 <pre>
 1838	        zs = self._zeros(10, int)
 1839	        assert_equal(zs, pickle.loads(zs.dumps()))
-1840	
+1840
 </pre>
 </div>
 
@@ -4757,7 +4757,7 @@ pre {
 <pre>
 1845	                p = pickle.dumps(zs, protocol=proto)
 1846	                zs2 = pickle.loads(p)
-1847	
+1847
 </pre>
 </div>
 
@@ -4780,7 +4780,7 @@ pre {
 <pre>
 1854	        pk_dmp = pickle.dumps(arr)
 1855	        pk_load = pickle.loads(pk_dmp)
-1856	
+1856
 </pre>
 </div>
 
@@ -4875,7 +4875,7 @@ pre {
 4364	                    pickle.dumps(arr_with_object, protocol=proto))
 4365	            depickled_arr_without_object = pickle.loads(
 4366	                    pickle.dumps(arr_without_object, protocol=proto))
-4367	
+4367
 </pre>
 </div>
 
@@ -4896,10 +4896,10 @@ pre {
 
 <div class="code">
 <pre>
-4385	
+4385
 4386	        depickled_f_contiguous_array = pickle.loads(bytes_string,
 4387	                                                    buffers=buffers)
-4388	
+4388
 </pre>
 </div>
 
@@ -4923,7 +4923,7 @@ pre {
 4398	        for proto in range(2, pickle.HIGHEST_PROTOCOL + 1):
 4399	            depickled_non_contiguous_array = pickle.loads(
 4400	                    pickle.dumps(non_contiguous_array, protocol=proto))
-4401	
+4401
 </pre>
 </div>
 
@@ -4969,7 +4969,7 @@ pre {
 <pre>
 4425	    def _loads(self, obj):
 4426	        return pickle.loads(obj, encoding=&#x27;latin1&#x27;)
-4427	
+4427
 </pre>
 </div>
 
@@ -4990,9 +4990,9 @@ pre {
 
 <div class="code">
 <pre>
-4479	
+4479
 4480	        new = pickle.loads(pickle.dumps(original_byte_reversed))
-4481	
+4481
 </pre>
 </div>
 
@@ -5060,7 +5060,7 @@ pre {
 
 <div class="code">
 <pre>
-165	
+165
 166	        recordarr_r = eval(&quot;np.&quot; + repr(recordarr), {&#x27;np&#x27;: np})
 167	        recarr_r = eval(&quot;np.&quot; + repr(recarr), {&#x27;np&#x27;: np})
 </pre>
@@ -5108,7 +5108,7 @@ pre {
 <pre>
 168	        # Prints the type `numpy.record` as part of the dtype:
 169	        recordview_r = eval(&quot;np.&quot; + repr(recordview), {&#x27;np&#x27;: np, &#x27;numpy&#x27;: np})
-170	
+170
 </pre>
 </div>
 
@@ -5155,7 +5155,7 @@ pre {
 410	            assert_equal(a, pickle.loads(pickle.dumps(a, protocol=proto)))
 411	            assert_equal(a[0], pickle.loads(pickle.dumps(a[0],
 412	                                                         protocol=proto)))
-413	
+413
 </pre>
 </div>
 
@@ -5202,7 +5202,7 @@ pre {
 417	            assert_equal(a, pickle.loads(pickle.dumps(a, protocol=proto)))
 418	            assert_equal(a[0], pickle.loads(pickle.dumps(a[0],
 419	                                                         protocol=proto)))
-420	
+420
 </pre>
 </div>
 
@@ -5434,7 +5434,7 @@ pre {
 1267	                pickle.dumps(test_string, protocol=proto)) == test_string)
 1268	            assert_(pickle.loads(
 1269	                pickle.dumps(test_record, protocol=proto)) == test_record)
-1270	
+1270
 </pre>
 </div>
 
@@ -5457,7 +5457,7 @@ pre {
 <pre>
 1900	        blob = pickle.dumps(data, protocol=1)
 1901	        data = pickle.loads(blob)
-1902	
+1902
 </pre>
 </div>
 
@@ -5573,7 +5573,7 @@ pre {
 2205	            test_string = np.bytes_(&#x27;&#x27;)
 2206	            assert_equal(pickle.loads(
 2207	                pickle.dumps(test_string, protocol=proto)), test_string)
-2208	
+2208
 </pre>
 </div>
 
@@ -5596,7 +5596,7 @@ pre {
 <pre>
 2429	            dumped = pickle.dumps(arr, protocol=proto)
 2430	            assert_equal(pickle.loads(dumped), arr)
-2431	
+2431
 </pre>
 </div>
 
@@ -5918,7 +5918,7 @@ pre {
 <pre>
 399	    with open(f.name, &quot;rb&quot;) as f:
 400	        res = pickle.load(f)
-401	
+401
 </pre>
 </div>
 
@@ -5942,7 +5942,7 @@ pre {
 195	        for proto in range(2, pickle.HIGHEST_PROTOCOL + 1):
 196	            assert_(pickle.loads(pickle.dumps(np.sin,
 197	                                              protocol=proto)) is np.sin)
-198	
+198
 </pre>
 </div>
 
@@ -5989,7 +5989,7 @@ pre {
 <pre>
 207	                   b&quot;(S&#x27;numpy._core.umath&#x27;\np1\nS&#x27;cos&#x27;\np2\ntp3\nRp4\n.&quot;)
 208	        assert_(pickle.loads(astring) is np.cos)
-209	
+209
 </pre>
 </div>
 
@@ -6010,7 +6010,7 @@ pre {
 
 <div class="code">
 <pre>
-217	
+217
 218	        obj = pickle.loads(pickle.dumps(_pickleable_module_global.ufunc))
 219	        assert obj is umt._pickleable_module_global_ufunc
 </pre>
@@ -6150,7 +6150,7 @@ pre {
 <pre>
 618	        l2.append(&#x27;f%d(v)&#x27; % (i))
 619	    return eval(&#x27;%s:%s&#x27; % (l1, &#x27; and &#x27;.join(l2)))
-620	
+620
 </pre>
 </div>
 
@@ -6173,7 +6173,7 @@ pre {
 <pre>
 626	        l2.append(&#x27;f%d(v)&#x27; % (i))
 627	    return eval(&#x27;%s:%s&#x27; % (l1, &#x27; or &#x27;.join(l2)))
-628	
+628
 </pre>
 </div>
 
@@ -6196,7 +6196,7 @@ pre {
 <pre>
 630	def l_not(f):
 631	    return eval(&#x27;lambda v,f=f:not f(v)&#x27;)
-632	
+632
 </pre>
 </div>
 
@@ -6956,7 +6956,7 @@ pre {
 <pre>
 542	        with gzip.open(pkl_file) as gz:
 543	            sfc = pickle.load(gz)
-544	
+544
 </pre>
 </div>
 
@@ -7117,7 +7117,7 @@ pre {
 <pre>
 1293	def runstring(astr, dict):
 1294	    exec(astr, dict)
-1295	
+1295
 </pre>
 </div>
 
@@ -7187,7 +7187,7 @@ pre {
 44	        assert_equal(repr(np._NoValue), &#x27;&lt;no value&gt;&#x27;)
 45	        assert_(pickle.loads(pickle.dumps(np._NoValue,
 46	                                          protocol=proto)) is np._NoValue)
-47	
+47
 </pre>
 </div>
 
@@ -7256,7 +7256,7 @@ pre {
 <pre>
 64	def md5(s: str) -&gt; str:  # pragma: win32 no cover
 65	    return hashlib.md5(s.encode()).hexdigest()
-66	
+66
 </pre>
 </div>
 
@@ -7279,7 +7279,7 @@ pre {
 <pre>
 85	            with f.open(nuspec) as spec:
 86	                tree = xml.etree.ElementTree.parse(spec)
-87	
+87
 </pre>
 </div>
 
@@ -7371,7 +7371,7 @@ pre {
 <pre>
 84	        with tarfile.open(fileobj=bio) as tf:
 85	            tf.extractall(dest)
-86	
+86
 </pre>
 </div>
 
@@ -7392,9 +7392,9 @@ pre {
 
 <div class="code">
 <pre>
-93	
+93
 94	                resp = urllib.request.urlopen(url)
-95	
+95
 </pre>
 </div>
 
@@ -7440,7 +7440,7 @@ pre {
 <pre>
 34	        self.value = value
 35	        document = minidom.parseString(f&quot;&lt;html-root&gt;{value}&lt;/html-root&gt;&quot;)
-36	
+36
 </pre>
 </div>
 
@@ -7737,7 +7737,7 @@ pre {
 
 <div class="code">
 <pre>
-646	
+646
 647	        content = urlopen(KEYWORDS_URL).read().decode(&#x27;utf-8&#x27;, errors=&#x27;ignore&#x27;)
 648	        keywords = parse_keywords(content)
 </pre>
@@ -7762,7 +7762,7 @@ pre {
 <pre>
 147	                    x = x.encode(&quot;utf-8&quot;)
 148	                return hashlib.md5(x).hexdigest()
-149	
+149
 </pre>
 </div>
 
@@ -7785,7 +7785,7 @@ pre {
 <pre>
 155	                    x = x.encode(&quot;utf-8&quot;)
 156	                return hashlib.sha1(x).hexdigest()
-157	
+157
 </pre>
 </div>
 
@@ -7806,7 +7806,7 @@ pre {
 
 <div class="code">
 <pre>
-204	
+204
 205	        cnonce = hashlib.sha1(s).hexdigest()[:16]
 206	        if _algorithm == &quot;MD5-SESS&quot;:
 </pre>
@@ -7831,7 +7831,7 @@ pre {
 <pre>
 474	        &quot;&quot;&quot;Get meta information (can not be changed after construction).&quot;&quot;&quot;
 475	        return {} if self._meta is None else cast(Dict[str, Any], loads(self._meta))
-476	
+476
 </pre>
 </div>
 
@@ -7854,7 +7854,7 @@ pre {
 <pre>
 739	            _locs_ = _globs_
 740	        exec(&quot;&quot;&quot;exec _code_ in _globs_, _locs_&quot;&quot;&quot;)
-741	
+741
 </pre>
 </div>
 
@@ -8029,7 +8029,7 @@ pre {
 <pre>
 532	        try:
 533	            x = eval(self.arg, globals(), self._dict)
-534	
+534
 </pre>
 </div>
 
@@ -8121,7 +8121,7 @@ pre {
 <pre>
 112	    def md5_not_for_security() -&gt; Any:
 113	        return hashlib.md5()
-114	
+114
 </pre>
 </div>
 
@@ -8211,7 +8211,7 @@ pre {
 
 <div class="code">
 <pre>
-272	
+272
 273	            annotation = eval(expression, cls_namespace, locals_)
 274	        else:
 </pre>
@@ -8257,9 +8257,9 @@ pre {
 
 <div class="code">
 <pre>
-114	
+114
 115	        return jinja2.Environment(**env_options)
-116	
+116
 </pre>
 </div>
 
@@ -8397,7 +8397,7 @@ pre {
 <pre>
 335	    # fallback to non verified HTTPS (the information we request is not sensitive, so fallback)
 336	    yield ssl._create_unverified_context()  # noqa: S323, SLF001
-337	
+337
 </pre>
 </div>
 
