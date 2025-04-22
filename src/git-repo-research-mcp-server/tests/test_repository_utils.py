@@ -11,6 +11,7 @@
 """Tests for Git Repository Research MCP Server utility functions."""
 
 import json
+import pytest
 from awslabs.git_repo_research_mcp_server.models import (
     Constants,
     IndexMetadata,
@@ -352,7 +353,8 @@ def test_format_size():
     assert format_size(1500000000) == '1.40 GB'
 
 
-def test_delete_indexed_repository_not_found():
+@pytest.mark.asyncio
+async def test_delete_indexed_repository_not_found():
     """Test deleting a repository that doesn't exist."""
     with (
         patch(
@@ -385,14 +387,15 @@ def test_delete_indexed_repository_not_found():
         mock_load_metadata.return_value = None
 
         # Call the function
-        result = delete_indexed_repository('test_repo')
+        result = await delete_indexed_repository('test_repo')
 
         # Verify the result
         assert result['status'] == 'error'
         assert "Repository 'test_repo' not found in index directory" in result['message']
 
 
-def test_delete_indexed_repository_success():
+@pytest.mark.asyncio
+async def test_delete_indexed_repository_success():
     """Test successfully deleting a repository."""
     with (
         patch(
@@ -424,7 +427,7 @@ def test_delete_indexed_repository_success():
         mock_load_metadata.return_value = metadata
 
         # Call the function
-        result = delete_indexed_repository('test_repo')
+        result = await delete_indexed_repository('test_repo')
 
         # Verify the result
         assert result['status'] == 'success'
@@ -438,7 +441,8 @@ def test_delete_indexed_repository_success():
         mock_logger_info.assert_called()  # Logging should occur
 
 
-def test_delete_indexed_repository_permission_denied():
+@pytest.mark.asyncio
+async def test_delete_indexed_repository_permission_denied():
     """Test deleting a repository with permission issues."""
     with (
         patch(
@@ -465,7 +469,7 @@ def test_delete_indexed_repository_permission_denied():
         mock_load_metadata.return_value = metadata
 
         # Call the function
-        result = delete_indexed_repository('test_repo')
+        result = await delete_indexed_repository('test_repo')
 
         # Verify the result
         assert result['status'] == 'error'
@@ -474,7 +478,8 @@ def test_delete_indexed_repository_permission_denied():
         assert len(result['permission_issues']) > 0
 
 
-def test_delete_indexed_repository_partial_success():
+@pytest.mark.asyncio
+async def test_delete_indexed_repository_partial_success():
     """Test partially successful repository deletion."""
     with (
         patch(
@@ -511,7 +516,7 @@ def test_delete_indexed_repository_partial_success():
         mock_rmtree.side_effect = Exception('Permission denied')
 
         # Call the function
-        result = delete_indexed_repository('test_repo')
+        result = await delete_indexed_repository('test_repo')
 
         # Verify the result
         assert result['status'] == 'partial'
@@ -527,7 +532,8 @@ def test_delete_indexed_repository_partial_success():
         mock_logger_error.assert_called()  # Error logging should occur
 
 
-def test_delete_indexed_repository_complete_failure():
+@pytest.mark.asyncio
+async def test_delete_indexed_repository_complete_failure():
     """Test completely failed repository deletion."""
     with (
         patch(
@@ -561,7 +567,7 @@ def test_delete_indexed_repository_complete_failure():
         mock_remove.side_effect = Exception('Permission denied')
 
         # Call the function
-        result = delete_indexed_repository('test_repo')
+        result = await delete_indexed_repository('test_repo')
 
         # Verify the result
         assert result['status'] == 'error'
@@ -624,7 +630,8 @@ def test_list_indexed_repositories_with_repository_directory():
         assert result.repositories[0].repository_directory.endswith('/repository')
 
 
-def test_delete_indexed_repository_index_dir_not_exists():
+@pytest.mark.asyncio
+async def test_delete_indexed_repository_index_dir_not_exists():
     """Test deleting a repository when the index directory doesn't exist."""
     with (
         patch(
@@ -637,14 +644,15 @@ def test_delete_indexed_repository_index_dir_not_exists():
         mock_exists.return_value = False  # Index directory doesn't exist
 
         # Call the function
-        result = delete_indexed_repository('test_repo')
+        result = await delete_indexed_repository('test_repo')
 
         # Verify the result
         assert result['status'] == 'error'
         assert 'Index directory /home/user/.git_repo_research does not exist' in result['message']
 
 
-def test_delete_indexed_repository_with_file_index():
+@pytest.mark.asyncio
+async def test_delete_indexed_repository_with_file_index():
     """Test deleting a repository when the index is a file."""
     with (
         patch(
@@ -675,7 +683,7 @@ def test_delete_indexed_repository_with_file_index():
         mock_load_metadata.return_value = metadata
 
         # Call the function
-        result = delete_indexed_repository('test_repo')
+        result = await delete_indexed_repository('test_repo')
 
         # Verify the result
         assert result['status'] == 'success'
@@ -686,7 +694,8 @@ def test_delete_indexed_repository_with_file_index():
         mock_logger_info.assert_called()  # Logging should occur
 
 
-def test_delete_indexed_repository_absolute_path():
+@pytest.mark.asyncio
+async def test_delete_indexed_repository_absolute_path():
     """Test deleting a repository using an absolute path."""
     with (
         patch(
@@ -718,7 +727,7 @@ def test_delete_indexed_repository_absolute_path():
         mock_load_metadata.return_value = metadata
 
         # Call the function with absolute path
-        result = delete_indexed_repository('/absolute/path/to/test_repo')
+        result = await delete_indexed_repository('/absolute/path/to/test_repo')
 
         # Verify the result
         assert result['status'] == 'success'
