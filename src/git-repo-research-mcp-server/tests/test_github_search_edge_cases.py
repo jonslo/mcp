@@ -160,8 +160,8 @@ def test_github_repo_search_graphql_with_errors():
 def test_github_repo_search_graphql_with_exception():
     """Test GitHub repository search with GraphQL API exception."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with patch(
         'awslabs.git_repo_research_mcp_server.github_search.github_graphql_request'
@@ -185,8 +185,8 @@ def test_github_repo_search_graphql_with_exception():
 def test_github_repo_search_graphql_duplicate_urls():
     """Test GitHub repository search with duplicate URLs in results."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with patch(
         'awslabs.git_repo_research_mcp_server.github_search.github_graphql_request'
@@ -263,8 +263,8 @@ def test_github_repo_search_graphql_duplicate_urls():
 def test_github_repo_search_graphql_org_mismatch():
     """Test GitHub repository search with organization mismatch."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with patch(
         'awslabs.git_repo_research_mcp_server.github_search.github_graphql_request'
@@ -313,8 +313,8 @@ def test_github_repo_search_graphql_org_mismatch():
 def test_github_repo_search_rest_with_exception():
     """Test GitHub repository search with REST API exception."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with patch('requests.get') as mock_get:
         # Configure the mock to raise an exception
@@ -335,8 +335,8 @@ def test_github_repo_search_rest_with_exception():
 def test_github_repo_search_rest_with_http_error():
     """Test GitHub repository search with REST API HTTP error."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with patch('requests.get') as mock_get:
         # Configure the mock to raise an HTTP error
@@ -357,8 +357,8 @@ def test_github_repo_search_rest_with_http_error():
 def test_github_repo_search_rest_with_duplicate_urls():
     """Test GitHub repository search with REST API and duplicate URLs."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with patch('requests.get') as mock_get:
         # Configure the mock to return duplicate URLs across different orgs
@@ -421,8 +421,8 @@ def test_github_repo_search_rest_with_duplicate_urls():
 def test_github_repo_search_rest_with_license_filter():
     """Test GitHub repository search with REST API and license filter."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with patch('requests.get') as mock_get:
         # Configure the mock to return repos with different licenses
@@ -478,8 +478,8 @@ def test_github_repo_search_rest_with_license_filter():
 def test_github_repo_search_wrapper_with_string_keywords():
     """Test GitHub repository search wrapper with string keywords."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with (
         patch('os.environ.get') as mock_env,
@@ -525,8 +525,8 @@ def test_github_repo_search_wrapper_with_string_keywords():
 def test_github_repo_search_wrapper_with_args():
     """Test GitHub repository search wrapper with args parameter."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with (
         patch('os.environ.get') as mock_env,
@@ -572,8 +572,8 @@ def test_github_repo_search_wrapper_with_args():
 def test_github_repo_search_wrapper_with_generic_kwargs():
     """Test GitHub repository search wrapper with generic kwargs."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with (
         patch('os.environ.get') as mock_env,
@@ -618,8 +618,8 @@ def test_github_repo_search_wrapper_with_generic_kwargs():
 def test_github_repo_search_wrapper_exception():
     """Test GitHub repository search wrapper with exception."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with (
         patch('os.environ.get') as mock_env,

@@ -64,8 +64,8 @@ async def test_repository_indexing(test_context, remote_git_repo, tmp_path, monk
     repo_name = 'awslabs_mcp'
 
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping in CI environment')
 
     # Create a mock for BedrockEmbeddings
     with patch(
@@ -270,8 +270,8 @@ async def test_repository_indexing_with_different_output_path(
     custom_output_path = 'custom_output_repo'
 
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping in CI environment')
 
     # Create a mock for BedrockEmbeddings
     with patch(

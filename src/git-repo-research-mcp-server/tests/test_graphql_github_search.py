@@ -175,8 +175,8 @@ def test_extract_org_from_url():
 def test_github_graphql_request(mock_graphql_response):
     """Test GitHub GraphQL request function."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
     with patch('requests.post') as mock_post:
         # Configure the mock
         mock_response = MagicMock()
@@ -204,8 +204,8 @@ def test_github_graphql_request(mock_graphql_response):
 def test_github_graphql_request_rate_limit():
     """Test GitHub GraphQL request function with rate limiting."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
     with patch('requests.post') as mock_post, patch('time.sleep') as mock_sleep:
         # Configure the mock for rate limit response
         rate_limit_response = MagicMock()
@@ -240,8 +240,8 @@ def test_github_graphql_request_rate_limit():
 def test_github_repo_search_graphql(mock_graphql_response):
     """Test GitHub repository search using GraphQL API."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
     with patch(
         'awslabs.git_repo_research_mcp_server.github_search.github_graphql_request'
     ) as mock_request:
@@ -279,8 +279,8 @@ def test_github_repo_search_graphql(mock_graphql_response):
 def test_github_repo_search_graphql_with_license_filter(mock_graphql_response):
     """Test GitHub repository search with license filter."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
     with patch(
         'awslabs.git_repo_research_mcp_server.github_search.github_graphql_request'
     ) as mock_request:
@@ -306,8 +306,8 @@ def test_github_repo_search_graphql_with_license_filter(mock_graphql_response):
 def test_github_repo_search_rest(mock_rest_response):
     """Test GitHub repository search using REST API."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
     with patch('requests.get') as mock_get:
         # Configure the mock
         mock_response = MagicMock()
@@ -343,8 +343,8 @@ def test_github_repo_search_rest(mock_rest_response):
 def test_github_repo_search_wrapper_with_token(mock_graphql_response):
     """Test GitHub repository search wrapper with token."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
     with (
         patch('os.environ.get') as mock_env,
         patch(
@@ -410,8 +410,8 @@ def test_github_repo_search_wrapper_with_token(mock_graphql_response):
 def test_github_repo_search_wrapper_without_token(mock_rest_response):
     """Test GitHub repository search wrapper without token."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
     with (
         patch('os.environ.get') as mock_env,
         patch(
@@ -477,8 +477,8 @@ def test_github_repo_search_wrapper_without_token(mock_rest_response):
 async def test_mcp_search_github_repos(test_context):
     """Test the MCP tool for searching GitHub repositories."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     with patch(
         'awslabs.git_repo_research_mcp_server.server.mcp_search_github_repos'
@@ -555,8 +555,8 @@ async def test_mcp_search_github_repos(test_context):
 async def test_mcp_search_github_repos_error_handling(test_context):
     """Test error handling in the MCP tool for searching GitHub repositories."""
     # Skip in CI environment
-    if os.environ.get('CI') == 'true':
-        pytest.skip('Skipping GitHub API test in CI environment')
+    # if os.environ.get('CI') == 'true':
+    #     pytest.skip('Skipping GitHub API test in CI environment')
 
     # We need to patch the server function directly since the wrapper exception is caught
     with patch(
