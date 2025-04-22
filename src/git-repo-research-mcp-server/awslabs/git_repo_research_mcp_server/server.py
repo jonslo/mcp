@@ -972,6 +972,9 @@ async def mcp_delete_repository(
     normalized_repo_name = str(repository_name_or_path).replace('/', '_')
     logger.info(f'Normalized repository name: {normalized_repo_name}')
 
+    # Properly await the info call
+    await ctx.info(f'Deleting repository: {normalized_repo_name}')
+
     # Ensure index_directory is None or a string, not a Field
     index_dir = None if index_directory is None else str(index_directory)
 
@@ -980,7 +983,7 @@ async def mcp_delete_repository(
         start_time = datetime.now()
 
         # Delete the repository
-        result = delete_indexed_repository(
+        result = await delete_indexed_repository(
             repository_name_or_path=normalized_repo_name,
             index_dir=index_dir,
         )

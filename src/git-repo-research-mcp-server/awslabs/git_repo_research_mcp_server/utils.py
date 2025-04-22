@@ -169,7 +169,7 @@ def format_size(size_bytes: int) -> str:
         return f'{size_bytes / (1024 * 1024 * 1024):.2f} GB'
 
 
-def delete_indexed_repository(
+async def delete_indexed_repository(
     repository_name_or_path: str, index_dir: Optional[str] = None
 ) -> Dict[str, Union[str, List[str]]]:
     """Delete an indexed repository.

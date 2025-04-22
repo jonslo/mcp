@@ -284,7 +284,7 @@ class RepositoryIndexer:
         index_path = self._get_index_path(repository_name)
         return os.path.join(index_path, 'chunk_map.json')
 
-    def index_repository(
+    async def index_repository(
         self,
         repository_path: str,
         output_path: Optional[str] = None,
@@ -319,7 +319,7 @@ class RepositoryIndexer:
             if is_git_url(repository_path):
                 logger.info(f'Cloning repository from {repository_path}')
                 if ctx:
-                    ctx.info(f'Cloning repository from {repository_path}')
+                    await ctx.info(f'Cloning repository from {repository_path}')
                 temp_dir = clone_repository(repository_path)
                 repo_path = temp_dir
             else:
@@ -329,13 +329,13 @@ class RepositoryIndexer:
             repository_name = get_repository_name(repository_path)
             logger.info(f'Indexing repository: {repository_name}')
             if ctx:
-                ctx.info(f'Indexing repository: {repository_name}')
-                ctx.report_progress(0, 100)  # Start progress at 0%
+                await ctx.info(f'Indexing repository: {repository_name}')
+                await ctx.report_progress(0, 100)  # Start progress at 0%
 
             # Process the repository to get text chunks
             if ctx:
-                ctx.info('Processing repository files...')
-                ctx.report_progress(10, 100)  # 10% progress - starting file processing
+                await ctx.info('Processing repository files...')
+                await ctx.report_progress(10, 100)  # 10% progress - starting file processing
 
             chunks, chunk_to_file, extension_stats = process_repository(
                 repo_path,
@@ -351,8 +351,8 @@ class RepositoryIndexer:
             if not chunks:
                 logger.warning('No text chunks found in repository')
                 if ctx:
-                    ctx.info('No text chunks found in repository')
-                    ctx.report_progress(100, 100)  # Complete the progress
+                    await ctx.info('No text chunks found in repository')
+                    await ctx.report_progress(100, 100)  # Complete the progress
                 return IndexRepositoryResponse(
                     status='error',
                     repository_name=repository_name,
@@ -378,7 +378,7 @@ class RepositoryIndexer:
                     ctx and i % max(1, total_chunks // 10) == 0
                 ):  # Report progress every ~10% of chunks
                     progress = 40 + int((i / total_chunks) * 20)  # Progress from 40% to 60%
-                    ctx.report_progress(progress, 100)
+                    await ctx.report_progress(progress, 100)
 
                 file_path = chunk_to_file.get(chunk, 'unknown')
                 documents.append(
@@ -406,8 +406,8 @@ class RepositoryIndexer:
             # are included in the repository structure
             logger.info(f'Copying all files from {repo_path} to {repo_files_path}')
             if ctx:
-                ctx.info('Copying repository files...')
-                ctx.report_progress(60, 100)  # 60% progress - starting file copying
+                await ctx.info('Copying repository files...')
+                await ctx.report_progress(60, 100)  # 60% progress - starting file copying
 
             # First, ensure the target directory is empty
             if os.path.exists(repo_files_path):
@@ -447,8 +447,8 @@ class RepositoryIndexer:
             # Create FAISS index using LangChain
             logger.info('Creating FAISS index with LangChain')
             if ctx:
-                ctx.info('Creating FAISS index...')
-                ctx.report_progress(70, 100)  # 70% progress - starting index creation
+                await ctx.info('Creating FAISS index...')
+                await ctx.report_progress(70, 100)  # 70% progress - starting index creation
 
             embedding_function = self.embedding_generator.bedrock_embeddings
 
@@ -461,8 +461,8 @@ class RepositoryIndexer:
             # Create the FAISS index
             logger.info('Creating FAISS vector store from documents')
             if ctx:
-                ctx.info('Generating embeddings and creating vector store...')
-                ctx.report_progress(75, 100)  # 75% progress - creating vector store
+                await ctx.info('Generating embeddings and creating vector store...')
+                await ctx.report_progress(75, 100)  # 75% progress - creating vector store
 
             vector_store = FAISS.from_documents(
                 documents=documents,
@@ -477,8 +477,8 @@ class RepositoryIndexer:
             # Save the index without pickle
             logger.info(f'Saving index to {index_path}')
             if ctx:
-                ctx.info(f'Saving index to {index_path}')
-                ctx.report_progress(85, 100)  # 85% progress - saving index
+                await ctx.info(f'Saving index to {index_path}')
+                await ctx.report_progress(85, 100)  # 85% progress - saving index
 
             save_index_without_pickle(vector_store, index_path)
 
@@ -538,8 +538,8 @@ class RepositoryIndexer:
 
             # Create and save metadata
             if ctx:
-                ctx.info('Finalizing index metadata...')
-                ctx.report_progress(90, 100)  # 90% progress - creating metadata
+                await ctx.info('Finalizing index metadata...')
+                await ctx.report_progress(90, 100)  # 90% progress - creating metadata
 
             # Use output_path as repository_name if provided
             final_repo_name = output_path if output_path else repository_name
@@ -593,8 +593,8 @@ class RepositoryIndexer:
             logger.info(f'Indexing completed in {execution_time_ms}ms')
 
             if ctx:
-                ctx.info(f'Indexing completed in {execution_time_ms}ms')
-                ctx.report_progress(100, 100)  # 100% progress - completed
+                await ctx.info(f'Indexing completed in {execution_time_ms}ms')
+                await ctx.report_progress(100, 100)  # 100% progress - completed
 
             return IndexRepositoryResponse(
                 status='success',
@@ -614,8 +614,8 @@ class RepositoryIndexer:
             error_message = f'Error indexing repository: {str(e)}'
 
             if ctx:
-                ctx.error(error_message)
-                ctx.report_progress(100, 100)  # Complete the progress even on error
+                await ctx.error(error_message)
+                await ctx.report_progress(100, 100)  # Complete the progress even on error
 
             return IndexRepositoryResponse(
                 status='error',
