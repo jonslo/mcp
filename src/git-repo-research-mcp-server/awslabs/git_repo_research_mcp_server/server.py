@@ -940,13 +940,6 @@ async def mcp_access_file(
         logger.error(f'Error in mcp_access_file: {e}')
         await ctx.error(f'Error accessing file or directory: {str(e)}')
         raise Exception(f'Error accessing file: {str(e)}')
-    except Exception as e:
-        logger.error(f'Error accessing file or directory: {e}')
-        await ctx.error(f'Error accessing file or directory: {str(e)}')
-        return {
-            'status': 'error',
-            'message': f'Error accessing file or directory: {str(e)}',
-        }
 
 
 @mcp.tool(name='delete_research_repository')

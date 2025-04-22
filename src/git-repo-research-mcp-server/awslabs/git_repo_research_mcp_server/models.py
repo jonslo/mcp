@@ -118,7 +118,6 @@ class IndexedRepositoriesResponse(BaseModel):
     This model represents the complete response from a list operation,
     including all indexed repositories and summary statistics.
     """
-
     repositories: List[IndexedRepositoryInfo] = Field(
         default_factory=list, description='List of indexed repositories'
     )

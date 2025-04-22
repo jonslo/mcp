@@ -13,6 +13,7 @@
 import argparse
 import json
 import os
+from typing import Dict, List, Union
 import pytest
 import subprocess
 import tempfile
@@ -475,12 +476,26 @@ async def test_access_file_or_directory(test_context, test_git_repo, monkeypatch
         # Test accessing a directory
         src_path = f'{repo_name}/repository/src'
         src_result = await access_file_or_directory(src_path)
-        src_data = json.loads(src_result)
+        if isinstance(src_result, str):
+            src_data = json.loads(src_result)
+        elif isinstance(src_result, (bytes, bytearray)):
+            src_data = json.loads(src_result.decode())
+        elif isinstance(src_result, dict):
+            src_data = src_result
+        else:
+            try:
+                src_data = json.loads(json.dumps(src_result))
+            except (TypeError, json.JSONDecodeError):
+                src_data = json.loads(str(src_result))
 
-        assert src_data['status'] == 'success', 'Directory access failed'
-        assert src_data['type'] == 'directory', 'Wrong type for directory'
-        assert 'main.py' in src_data['files'], 'Expected file not found in directory'
-        assert 'utils.py' in src_data['files'], 'Expected file not found in directory'
+        src_data_dict: Dict[str, Union[str, List[str]]] = src_data
+
+        assert src_data_dict.get('status') == 'success', 'Directory access failed'
+        assert src_data_dict.get('type') == 'directory', 'Wrong type for directory'
+        
+        files_list = src_data_dict.get('files', [])
+        assert 'main.py' in files_list, 'Expected file not found in directory'
+        assert 'utils.py' in files_list, 'Expected file not found in directory'
 
         # Clean up
         await mcp_delete_repository(test_context, repository_name_or_path=repo_name)

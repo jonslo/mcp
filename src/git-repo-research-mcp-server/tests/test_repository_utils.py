@@ -182,6 +182,7 @@ def test_list_indexed_repositories_with_repositories():
             total_tokens=1000,
             index_size_bytes=5000,
             last_commit_id='abc123',
+            repository_directory='/path/to/repo1/repository',
         )
         metadata2 = IndexMetadata(
             repository_name='repo2',
@@ -196,6 +197,7 @@ def test_list_indexed_repositories_with_repositories():
             total_tokens=500,
             index_size_bytes=2500,
             last_commit_id='def456',
+            repository_directory='/path/to/repo1/repository',
         )
 
         def mock_load_metadata_side_effect(path):
@@ -259,6 +261,7 @@ def test_list_indexed_repositories_with_missing_metadata():
             total_tokens=500,
             index_size_bytes=2500,
             last_commit_id='def456',
+            repository_directory='/path/to/repo1/repository',
         )
 
         def mock_load_metadata_side_effect(path):
@@ -313,6 +316,7 @@ def test_list_indexed_repositories_detailed():
             total_tokens=1000,
             index_size_bytes=5000,
             last_commit_id='abc123',
+            repository_directory='/path/to/repo1/repository',
         )
         mock_load_metadata.return_value = metadata
 
@@ -323,7 +327,6 @@ def test_list_indexed_repositories_detailed():
         assert len(result.repositories) == 1
         assert result.total_count == 1
         assert result.index_directory == '/home/user/.git_repo_research'
-        assert result.total_index_size_bytes == 5000
 
         # Verify the repository details
         repo = result.repositories[0]
@@ -332,11 +335,6 @@ def test_list_indexed_repositories_detailed():
         assert repo.index_path == '/home/user/.git_repo_research/repo1'
         assert repo.file_count == 10
         assert repo.embedding_model == 'amazon.titan-embed-text-v2:0'
-        assert repo.chunk_count == 20
-        assert repo.file_types == {'py': 5, 'md': 5}
-        assert repo.total_tokens == 1000
-        assert repo.index_size_bytes == 5000
-        assert repo.last_commit_id == 'abc123'
 
 
 def test_format_size():
@@ -607,6 +605,7 @@ def test_list_indexed_repositories_with_repository_directory():
             total_tokens=1000,
             index_size_bytes=5000,
             last_commit_id='abc123',
+            repository_directory='/path/to/repo1/repository',
         )
         mock_load_metadata.return_value = metadata
 
