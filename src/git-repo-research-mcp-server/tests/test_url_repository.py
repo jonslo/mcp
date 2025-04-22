@@ -10,8 +10,8 @@
 # and limitations under the License.
 """Tests for Git Repository Research MCP Server with a remote repository."""
 
-import os
 import json
+import os
 import pytest
 
 # Import the server functionality
