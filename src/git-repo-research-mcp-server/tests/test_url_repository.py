@@ -11,7 +11,6 @@
 """Tests for Git Repository Research MCP Server with a remote repository."""
 
 import json
-import os
 import pytest
 
 # Import the server functionality

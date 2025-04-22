@@ -10,7 +10,6 @@
 # and limitations under the License.
 """Tests for GitHub GraphQL search functionality."""
 
-import os
 import pytest
 import time
 from awslabs.git_repo_research_mcp_server.github_search import (

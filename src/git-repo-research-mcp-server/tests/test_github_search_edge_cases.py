@@ -10,7 +10,6 @@
 # and limitations under the License.
 """Tests for GitHub search functionality edge cases and error handling."""
 
-import os
 import pytest
 import requests
 from awslabs.git_repo_research_mcp_server.github_search import (
