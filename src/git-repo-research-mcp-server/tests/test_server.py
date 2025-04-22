@@ -13,7 +13,6 @@
 import argparse
 import json
 import os
-from typing import Dict, List, Union
 import pytest
 import subprocess
 import tempfile
@@ -34,6 +33,7 @@ from awslabs.git_repo_research_mcp_server.server import (
     repository_summary,
 )
 from mcp.server.fastmcp import Image
+from typing import Dict, List, Union
 from unittest.mock import MagicMock, patch
 
 
@@ -492,7 +492,7 @@ async def test_access_file_or_directory(test_context, test_git_repo, monkeypatch
 
         assert src_data_dict.get('status') == 'success', 'Directory access failed'
         assert src_data_dict.get('type') == 'directory', 'Wrong type for directory'
-        
+
         files_list = src_data_dict.get('files', [])
         assert 'main.py' in files_list, 'Expected file not found in directory'
         assert 'utils.py' in files_list, 'Expected file not found in directory'
