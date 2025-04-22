@@ -345,7 +345,7 @@ async def mcp_index_repository(
         )
 
         # Index the repository
-        response = indexer.index_repository(
+        response = await indexer.index_repository(
             repository_path=repository_path,
             output_path=output_path,
             include_patterns=include_patterns,

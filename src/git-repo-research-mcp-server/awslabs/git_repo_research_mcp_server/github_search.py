@@ -414,7 +414,7 @@ def github_repo_search_wrapper(**kwargs) -> List[Dict[str, Any]]:
 
     # Ensure keywords is a list
     if isinstance(keywords, str):
-        keywords = [keywords]
+        keywords = keywords.split()
 
     # Get organizations to search in
     organizations = kwargs.get(

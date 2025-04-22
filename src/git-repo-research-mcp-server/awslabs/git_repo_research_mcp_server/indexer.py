@@ -346,7 +346,7 @@ class RepositoryIndexer:
             )
 
             if ctx:
-                ctx.report_progress(30, 100)  # 30% progress - files processed
+                await ctx.report_progress(30, 100)  # 30% progress - files processed
 
             if not chunks:
                 logger.warning('No text chunks found in repository')
@@ -368,8 +368,8 @@ class RepositoryIndexer:
 
             # Convert chunks to LangChain Document objects
             if ctx:
-                ctx.info(f'Converting {len(chunks)} chunks to Document objects...')
-                ctx.report_progress(40, 100)  # 40% progress - starting document creation
+                await ctx.info(f'Converting {len(chunks)} chunks to Document objects...')
+                await ctx.report_progress(40, 100)  # 40% progress - starting document creation
 
             documents = []
             total_chunks = len(chunks)
