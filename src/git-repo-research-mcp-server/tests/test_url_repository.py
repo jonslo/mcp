@@ -234,8 +234,11 @@ async def test_repository_indexing(test_context, remote_git_repo, tmp_path, monk
                 )
 
         except Exception as e:
-            # Test failed but we're only verifying we could attempt to index a GitHub repo
-            assert 'Error indexing repository' in str(e), f'Unexpected error: {str(e)}'
+            error_msg = str(e)
+            if isinstance(e, (TypeError, KeyError)):
+                pytest.fail(f"Error accessing repository data: {error_msg}")
+            else:
+                assert 'Error indexing repository' in error_msg, f'Unexpected error: {error_msg}'
 
 
 @pytest.mark.asyncio

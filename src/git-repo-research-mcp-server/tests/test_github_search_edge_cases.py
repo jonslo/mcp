@@ -11,6 +11,8 @@
 """Tests for GitHub search functionality edge cases and error handling."""
 
 import os
+import time
+
 import pytest
 import requests
 from awslabs.git_repo_research_mcp_server.github_search import (
@@ -18,8 +20,65 @@ from awslabs.git_repo_research_mcp_server.github_search import (
     github_repo_search_graphql,
     github_repo_search_rest,
     github_repo_search_wrapper,
+clean_github_url,
+extract_org_from_url
 )
 from unittest.mock import MagicMock, patch
+
+
+def test_clean_github_url_basic():
+    """Test basic URL cleaning"""
+    input_url = "https://github.com/aws-samples/aws-cdk-examples/blob/main/index.ts"
+    expected = "https://github.com/aws-samples/aws-cdk-examples"
+    assert clean_github_url(input_url) == expected
+
+def test_extract_org_from_url_basic():
+    """Test basic organization extraction"""
+    input_url = "https://github.com/aws-samples/repo"
+    expected = "aws-samples"
+    assert extract_org_from_url(input_url) == expected
+
+@pytest.mark.asyncio
+async def test_graphql_request_rate_limit():
+    """Test GraphQL rate limit handling"""
+    import time as time_module  # Renamed to avoid conflict
+
+    current_time = int(time_module.time())
+
+    with patch('requests.post') as mock_post:
+        mock_response = MagicMock()
+        mock_response.status_code = 403
+        mock_response.text = "API rate limit exceeded"
+        mock_response.headers = {"X-RateLimit-Reset": str(current_time + 30)}
+        mock_post.return_value = mock_response
+
+        result = github_graphql_request(
+            query="query{}",
+            variables={},
+            token=None
+        )
+
+        assert result == {'data': {'search': {'edges': []}}}
+
+
+@patch('os.environ.get')
+def test_github_repo_search_wrapper_string_keywords(mock_env_get):
+    """Test wrapper with string keywords"""
+    mock_env_get.return_value = None
+
+    with patch('awslabs.git_repo_research_mcp_server.github_search.github_repo_search_rest') as mock_rest:
+        mock_rest.return_value = []
+
+        # Call wrapper with string keywords
+        github_repo_search_wrapper(keywords="test keyword")
+
+        # Verify the call
+        mock_rest.assert_called_once_with(
+            keywords=["test", "keyword"],
+            organizations=['aws-samples', 'aws-solutions-library-samples', 'awslabs'],
+            num_results=5,
+            license_filter=None
+        )
 
 
 def test_github_graphql_request_rate_limit_no_token():
