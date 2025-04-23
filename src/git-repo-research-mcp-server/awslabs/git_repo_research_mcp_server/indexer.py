@@ -40,11 +40,18 @@ from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from loguru import logger
+from pydantic import BaseModel, field_validator
+from pydantic_core.core_schema import ValidationInfo
 from typing import Any, Dict, List, Optional, Tuple
-from pydantic import BaseModel, validator
 
-# Add these new models after the existing imports and before the RepositoryIndexer class
+
 class RepositoryConfig(BaseModel):
+    """Configuration for repository indexing.
+
+    This class defines the configuration parameters for indexing a Git repository,
+    including paths, patterns for file inclusion/exclusion, and chunking parameters.
+    """
+
     repository_path: str
     output_path: Optional[str] = None
     include_patterns: Optional[List[str]] = None
@@ -52,41 +59,91 @@ class RepositoryConfig(BaseModel):
     chunk_size: int = 1000
     chunk_overlap: int = 200
 
-    @validator('repository_path')
-    def validate_repository_path(cls, v):
-        if not (is_git_url(v) or os.path.exists(v)):
-            raise ValueError("Repository path must be a valid Git URL or existing local path")
+    @field_validator('repository_path')
+    @classmethod
+    def validate_repository_path(cls, git_string_url):
+        """Validate the repository path.
+
+        :param git_string_url: Git URL or local path
+        :return: Validated repository path.
+        """
+        if not (is_git_url(git_string_url) or os.path.exists(git_string_url)):
+            raise ValueError('Repository path must be a valid Git URL or existing local path')
+        return git_string_url
+
+    @field_validator('chunk_size')
+    @classmethod
+    def validate_chunk_size(cls, chunk_size):
+        """Validate the chunk size.
+
+        :param chunk_size: Chunk size value
+        :return: Validated chunk size.
+        """
+        if chunk_size <= 0:
+            raise ValueError('Chunk size must be positive')
+        return chunk_size
+
+    @field_validator('chunk_overlap')
+    @classmethod
+    def validate_chunk_overlap(cls, v: int, info: ValidationInfo) -> int:
+        """Validate the chunk overlap.
+
+        Args:
+            v: Chunk overlap value
+            info: Validation context information
+
+        Returns:
+            Validated chunk overlap value.
+        """
+        chunk_size = info.data.get('chunk_size', None)
+        if chunk_size is not None and v >= chunk_size:
+            raise ValueError('Chunk overlap must be less than chunk size')
         return v
 
-    @validator('chunk_size')
-    def validate_chunk_size(cls, v):
-        if v <= 0:
-            raise ValueError("Chunk size must be positive")
-        return v
-
-    @validator('chunk_overlap')
-    def validate_chunk_overlap(cls, v, values):
-        if 'chunk_size' in values and v >= values['chunk_size']:
-            raise ValueError("Chunk overlap must be less than chunk size")
-        return v
 
 class IndexConfig(BaseModel):
+    """Configuration for the indexing process.
+
+    This class defines the configuration parameters for the indexing process,
+    including the embedding model and AWS-specific settings.
+    """
+
     embedding_model: str
     aws_region: Optional[str] = None
     aws_profile: Optional[str] = None
     index_dir: Optional[str] = None
 
-    @validator('embedding_model')
-    def validate_embedding_model(cls, v):
-        if v not in EmbeddingModel.__members__.values():
-            raise ValueError(f"Invalid embedding model. Must be one of: {list(EmbeddingModel.__members__.values())}")
-        return v
+    @field_validator('embedding_model')
+    @classmethod
+    def validate_embedding_model(cls, embedding_model):
+        """Validate the embedding model.
 
-    @validator('aws_region')
-    def validate_aws_region(cls, v):
-        if v and not v.startswith('us-'):  # Example validation
+        Args:
+            embedding_model: AWS embedding model
+
+        Returns:
+            Validated embedding model string.
+        """
+        if embedding_model not in EmbeddingModel.__members__.values():
+            raise ValueError(
+                f'Invalid embedding model. Must be one of: {list(EmbeddingModel.__members__.values())}'
+            )
+        return embedding_model
+
+    @field_validator('aws_region')
+    @classmethod
+    def validate_aws_region(cls, aws_region_string):
+        """Validate the AWS region.
+
+        Args:
+            aws_region_string: AWS region string
+
+        Returns:
+            Validated AWS region string.
+        """
+        if aws_region_string and not aws_region_string.startswith('us-'):  # Example validation
             raise ValueError("AWS region must start with 'us-'")
-        return v
+        return aws_region_string
 
 
 def get_docstore_dict(docstore):
@@ -424,6 +481,10 @@ class RepositoryIndexer:
                         metadata={'source': file_path, 'chunk_id': i},
                     )
                 )
+            logger.debug(f'Number of documents to embed: {len(documents)}')
+            logger.debug(
+                f'Embedding function type: {type(self.embedding_generator.bedrock_embeddings)}'
+            )
 
             # Determine the output path
             if config.output_path:
@@ -486,24 +547,44 @@ class RepositoryIndexer:
             if ctx:
                 await ctx.info('Creating FAISS index...')
                 await ctx.report_progress(70, 100)  # 70% progress - starting index creation
+            logger.debug(f'Created {len(documents)} documents')
 
             embedding_function = self.embedding_generator.bedrock_embeddings
+            logger.debug(f'Using embedding function: {embedding_function}')
 
             # Debug: Print document count and first document
             logger.info(f'Document count: {len(documents)}')
             if documents:
                 logger.info(f'First document content: {documents[0].page_content[:100]}...')
                 logger.info(f'First document metadata: {documents[0].metadata}')
+                try:
+                    test_embedding = self.embedding_generator.bedrock_embeddings.embed_documents(
+                        [documents[0].page_content]
+                    )
+                    logger.debug(f'Test embedding successful, length: {len(test_embedding)}')
+                except Exception as e:
+                    logger.error(f'Test embedding failed: {e}')
+                    raise
 
             # Create the FAISS index
             logger.info('Creating FAISS vector store from documents')
+            embedding_function = self.embedding_generator.bedrock_embeddings
+            logger.debug(f'Using embedding function: {embedding_function}')
+
             if ctx:
                 await ctx.info('Generating embeddings and creating vector store...')
                 await ctx.report_progress(75, 100)  # 75% progress - creating vector store
 
+            logger.debug(f'Number of documents: {len(documents)}')
+            logger.debug(f'Embedding function: {self.embedding_generator.bedrock_embeddings}')
+
             vector_store = FAISS.from_documents(
                 documents=documents,
                 embedding=embedding_function,
+            )
+
+            logger.debug(
+                f'Created vector store with {get_docstore_dict_size(vector_store.docstore)} documents'
             )
 
             # Debug: Print vector store info

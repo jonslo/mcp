@@ -17,7 +17,7 @@ using LangChain's FAISS implementation.
 import os
 import time
 from awslabs.git_repo_research_mcp_server.embeddings import get_embedding_generator
-from awslabs.git_repo_research_mcp_server.indexer import get_repository_indexer
+from awslabs.git_repo_research_mcp_server.indexer import IndexConfig, get_repository_indexer
 from awslabs.git_repo_research_mcp_server.models import (
     Constants,
     EmbeddingModel,
@@ -54,6 +54,13 @@ class RepositorySearcher:
         self.aws_profile = aws_profile
         self.index_dir = index_dir or os.path.expanduser(f'~/{Constants.DEFAULT_INDEX_DIR}')
 
+        self.config = IndexConfig(
+            embedding_model=embedding_model,
+            aws_region=aws_region,
+            aws_profile=aws_profile,
+            index_dir=index_dir or os.path.expanduser(f'~/{Constants.DEFAULT_INDEX_DIR}'),
+        )
+
         # Initialize the embedding generator
         self.embedding_generator = get_embedding_generator(
             model_id=embedding_model,
@@ -62,12 +69,7 @@ class RepositorySearcher:
         )
 
         # Initialize the repository indexer
-        self.repository_indexer = get_repository_indexer(
-            embedding_model=embedding_model,
-            aws_region=aws_region,
-            aws_profile=aws_profile,
-            index_dir=index_dir,
-        )
+        self.repository_indexer = get_repository_indexer(self.config)
 
     def list_repository_files(self, repository_name: str) -> Optional[str]:
         """Generate a directory tree structure of the repository files.

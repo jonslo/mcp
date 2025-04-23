@@ -24,10 +24,9 @@ from typing import Optional
 def create_bedrock_embeddings(
     model_id: str = EmbeddingModel.AMAZON_TITAN_EMBED_TEXT_V2,
     aws_region: Optional[str] = None,
-    aws_profile: Optional[str] = None
+    aws_profile: Optional[str] = None,
 ) -> BedrockEmbeddings:
-    """
-    Create and return an instance of BedrockEmbeddings.
+    """Create and return an instance of BedrockEmbeddings.
 
     Args:
         model_id: ID of the embedding model to use
@@ -46,7 +45,6 @@ def create_bedrock_embeddings(
     )
     logger.info(f'Created BedrockEmbeddings with model: {model_id}')
     return bedrock_embeddings
-
 
 
 def get_embedding_generator(

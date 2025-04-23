@@ -18,7 +18,11 @@ import sys
 from awslabs.git_repo_research_mcp_server.github_search import (
     github_repo_search_wrapper,
 )
-from awslabs.git_repo_research_mcp_server.indexer import (get_repository_indexer, RepositoryConfig, IndexConfig)
+from awslabs.git_repo_research_mcp_server.indexer import (
+    IndexConfig,
+    RepositoryConfig,
+    get_repository_indexer,
+)
 from awslabs.git_repo_research_mcp_server.models import (
     DeleteRepositoryResponse,
     EmbeddingModel,
@@ -348,9 +352,7 @@ async def mcp_index_repository(
         aws_profile = os.environ.get('AWS_PROFILE')
 
         index_config = IndexConfig(
-            embedding_model=embedding_model,
-            aws_region=aws_region,
-            aws_profile=aws_profile
+            embedding_model=embedding_model, aws_region=aws_region, aws_profile=aws_profile
         )
 
         repository_config = RepositoryConfig(
@@ -359,7 +361,7 @@ async def mcp_index_repository(
             include_patterns=include_patterns,
             exclude_patterns=exclude_patterns,
             chunk_size=chunk_size,
-            chunk_overlap=chunk_overlap
+            chunk_overlap=chunk_overlap,
         )
 
         # Get the repository indexer
