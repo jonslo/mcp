@@ -41,6 +41,52 @@ from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 from loguru import logger
 from typing import Any, Dict, List, Optional, Tuple
+from pydantic import BaseModel, validator
+
+# Add these new models after the existing imports and before the RepositoryIndexer class
+class RepositoryConfig(BaseModel):
+    repository_path: str
+    output_path: Optional[str] = None
+    include_patterns: Optional[List[str]] = None
+    exclude_patterns: Optional[List[str]] = None
+    chunk_size: int = 1000
+    chunk_overlap: int = 200
+
+    @validator('repository_path')
+    def validate_repository_path(cls, v):
+        if not (is_git_url(v) or os.path.exists(v)):
+            raise ValueError("Repository path must be a valid Git URL or existing local path")
+        return v
+
+    @validator('chunk_size')
+    def validate_chunk_size(cls, v):
+        if v <= 0:
+            raise ValueError("Chunk size must be positive")
+        return v
+
+    @validator('chunk_overlap')
+    def validate_chunk_overlap(cls, v, values):
+        if 'chunk_size' in values and v >= values['chunk_size']:
+            raise ValueError("Chunk overlap must be less than chunk size")
+        return v
+
+class IndexConfig(BaseModel):
+    embedding_model: str
+    aws_region: Optional[str] = None
+    aws_profile: Optional[str] = None
+    index_dir: Optional[str] = None
+
+    @validator('embedding_model')
+    def validate_embedding_model(cls, v):
+        if v not in EmbeddingModel.__members__.values():
+            raise ValueError(f"Invalid embedding model. Must be one of: {list(EmbeddingModel.__members__.values())}")
+        return v
+
+    @validator('aws_region')
+    def validate_aws_region(cls, v):
+        if v and not v.startswith('us-'):  # Example validation
+            raise ValueError("AWS region must start with 'us-'")
+        return v
 
 
 def get_docstore_dict(docstore):
@@ -225,34 +271,25 @@ class RepositoryIndexer:
     for Git repositories.
     """
 
-    def __init__(
-        self,
-        embedding_model: str = EmbeddingModel.AMAZON_TITAN_EMBED_TEXT_V2,
-        aws_region: Optional[str] = None,
-        aws_profile: Optional[str] = None,
-        index_dir: Optional[str] = None,
-    ):
+    def __init__(self, config: IndexConfig):
         """Initialize the repository indexer.
 
         Args:
-            embedding_model: ID of the embedding model to use
-            aws_region: AWS region to use (optional, uses default if not provided)
-            aws_profile: AWS profile to use (optional, uses default if not provided)
-            index_dir: Directory to store indices (optional, uses default if not provided)
+            config: IndexConfig object with indexer configuration
         """
-        self.embedding_model = embedding_model
-        self.aws_region = aws_region
-        self.aws_profile = aws_profile
-        self.index_dir = index_dir or os.path.expanduser(f'~/{Constants.DEFAULT_INDEX_DIR}')
+        self.embedding_model = config.embedding_model
+        self.aws_region = config.aws_region
+        self.aws_profile = config.aws_profile
+        self.index_dir = config.index_dir or os.path.expanduser(f'~/{Constants.DEFAULT_INDEX_DIR}')
 
         # Create the index directory if it doesn't exist
         os.makedirs(self.index_dir, exist_ok=True)
 
         # Initialize the embedding generator
         self.embedding_generator = get_embedding_generator(
-            model_id=embedding_model,
-            aws_region=aws_region,
-            aws_profile=aws_profile,
+            model_id=self.embedding_model,
+            aws_region=self.aws_region,
+            aws_profile=self.aws_profile,
         )
 
     def _get_index_path(self, repository_name: str) -> str:
@@ -296,23 +333,13 @@ class RepositoryIndexer:
 
     async def index_repository(
         self,
-        repository_path: str,
-        output_path: Optional[str] = None,
-        include_patterns: Optional[List[str]] = None,
-        exclude_patterns: Optional[List[str]] = None,
-        chunk_size: int = 1000,
-        chunk_overlap: int = 200,
+        config: RepositoryConfig,
         ctx: Optional[Any] = None,
     ) -> IndexRepositoryResponse:
         """Index a Git repository.
 
         Args:
-            repository_path: Path to local repository or URL to remote repository
-            output_path: Path to store the index (optional, uses default if not provided)
-            include_patterns: Glob patterns for files to include (optional)
-            exclude_patterns: Glob patterns for files to exclude (optional)
-            chunk_size: Maximum size of each chunk in characters
-            chunk_overlap: Overlap between chunks in characters
+            config: RepositoryConfig object with indexing configuration
             ctx: Context object for progress tracking (optional)
 
         Returns:
@@ -326,17 +353,17 @@ class RepositoryIndexer:
 
         try:
             # If the repository path is a URL, clone it
-            if is_git_url(repository_path):
-                logger.info(f'Cloning repository from {repository_path}')
+            if is_git_url(config.repository_path):
+                logger.info(f'Cloning repository from {config.repository_path}')
                 if ctx:
-                    await ctx.info(f'Cloning repository from {repository_path}')
-                temp_dir = clone_repository(repository_path)
+                    await ctx.info(f'Cloning repository from {config.repository_path}')
+                temp_dir = clone_repository(config.repository_path)
                 repo_path = temp_dir
             else:
-                repo_path = repository_path
+                repo_path = config.repository_path
 
             # Get the repository name
-            repository_name = get_repository_name(repository_path)
+            repository_name = get_repository_name(repo_path)
             logger.info(f'Indexing repository: {repository_name}')
             if ctx:
                 await ctx.info(f'Indexing repository: {repository_name}')
@@ -349,10 +376,10 @@ class RepositoryIndexer:
 
             chunks, chunk_to_file, extension_stats = process_repository(
                 repo_path,
-                include_patterns=include_patterns,
-                exclude_patterns=exclude_patterns,
-                chunk_size=chunk_size,
-                chunk_overlap=chunk_overlap,
+                include_patterns=config.include_patterns,
+                exclude_patterns=config.exclude_patterns,
+                chunk_size=config.chunk_size,
+                chunk_overlap=config.chunk_overlap,
             )
 
             if ctx:
@@ -772,26 +799,13 @@ class RepositoryIndexer:
             return None, None
 
 
-def get_repository_indexer(
-    embedding_model: str = EmbeddingModel.AMAZON_TITAN_EMBED_TEXT_V2,
-    aws_region: Optional[str] = None,
-    aws_profile: Optional[str] = None,
-    index_dir: Optional[str] = None,
-) -> RepositoryIndexer:
+def get_repository_indexer(config: IndexConfig) -> RepositoryIndexer:
     """Get a repository indexer.
 
     Args:
-        embedding_model: ID of the embedding model to use
-        aws_region: AWS region to use (optional, uses default if not provided)
-        aws_profile: AWS profile to use (optional, uses default if not provided)
-        index_dir: Directory to store indices (optional, uses default if not provided)
+        config: IndexConfig object with indexer configuration
 
     Returns:
         RepositoryIndexer instance
     """
-    return RepositoryIndexer(
-        embedding_model=embedding_model,
-        aws_region=aws_region,
-        aws_profile=aws_profile,
-        index_dir=index_dir,
-    )
+    return RepositoryIndexer(config)
