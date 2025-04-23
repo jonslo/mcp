@@ -34,7 +34,7 @@ from awslabs.git_repo_research_mcp_server.server import (
 )
 from mcp.server.fastmcp import Image
 from typing import Dict, List, Union
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 
 class TestContext:
@@ -51,6 +51,30 @@ class TestContext:
     async def report_progress(self, current, total, message=None):
         """Report progress."""
         pass
+
+
+@pytest.fixture
+def mock_embedding_setup():
+    """Create a mock embedding setup for tests."""
+
+    class MockBedrockEmbeddings:
+        def __init__(self):
+            self.bedrock_embeddings = self  # Self-reference to satisfy attribute check
+
+        def embed_documents(self, texts):
+            return [[0.1] * 1536 for _ in texts]
+
+        def embed_query(self, text):
+            return [0.1] * 1536
+
+    class MockEmbeddingGenerator:
+        def __init__(self):
+            self.bedrock_embeddings = MockBedrockEmbeddings()
+
+    mock_embeddings = MockBedrockEmbeddings()
+    mock_generator = MockEmbeddingGenerator()
+
+    return mock_embeddings, mock_generator
 
 
 @pytest.fixture
@@ -177,25 +201,22 @@ Calculates the sum of two numbers.
 
 
 @pytest.mark.asyncio
-async def test_mcp_index_repository(test_context, test_git_repo, monkeypatch):
+async def test_mcp_index_repository(
+    test_context, test_git_repo, monkeypatch, mock_embedding_setup
+):
     """Test indexing a repository."""
-
-    def mock_embed_documents(docs):
-        return [[0.1] * 1536 for _ in range(len(docs))]
+    mock_embeddings, mock_generator = mock_embedding_setup
 
     with patch(
         'awslabs.git_repo_research_mcp_server.embeddings.BedrockEmbeddings'
     ) as mock_bedrock:
         # Configure the mock
-        mock_embeddings = MagicMock()
-        mock_embeddings.embed_query.return_value = [0.1] * 1536
-        mock_embeddings.embed_documents.side_effect = mock_embed_documents
         mock_bedrock.return_value = mock_embeddings
 
         with patch(
             'awslabs.git_repo_research_mcp_server.indexer.get_embedding_generator'
         ) as mock_get_embedding:
-            mock_get_embedding.return_value.bedrock_embeddings = mock_embeddings
+            mock_get_embedding.return_value = mock_generator
 
         # Use a unique name for the repository
         repo_name = f'{os.path.basename(test_git_repo)}'
@@ -292,27 +313,21 @@ async def test_mcp_index_repository(test_context, test_git_repo, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_repository_summary(test_context, test_git_repo, monkeypatch):
+async def test_repository_summary(test_context, test_git_repo, monkeypatch, mock_embedding_setup):
     """Test repository summary resource."""
-
-    def mock_embed_documents(docs):
-        return [[0.1] * 1536 for _ in range(len(docs))]
+    mock_embeddings, mock_generator = mock_embedding_setup
 
     # Mock the Bedrock embeddings to avoid actual API calls
     with patch(
         'awslabs.git_repo_research_mcp_server.embeddings.BedrockEmbeddings'
     ) as mock_bedrock:
         # Configure the mock
-        mock_embeddings = MagicMock()
-        mock_embeddings.embed_query.return_value = [0.1] * 1536
-        # Make the mock return embeddings dynamically based on input length
-        mock_embeddings.embed_documents.side_effect = mock_embed_documents
         mock_bedrock.return_value = mock_embeddings
 
         with patch(
             'awslabs.git_repo_research_mcp_server.indexer.get_embedding_generator'
         ) as mock_get_embedding:
-            mock_get_embedding.return_value.bedrock_embeddings = mock_embeddings
+            mock_get_embedding.return_value = mock_generator
 
         # Use a unique name for the repository
         repo_name = f'{os.path.basename(test_git_repo)}'
@@ -403,19 +418,14 @@ async def test_repository_summary(test_context, test_git_repo, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_list_repositories(test_context, test_git_repo, monkeypatch):
+async def test_list_repositories(test_context, test_git_repo, monkeypatch, mock_embedding_setup):
     """Test listing repositories resource."""
-
-    def mock_embed_documents(docs):
-        return [[0.1] * 1536 for _ in range(len(docs))]
+    mock_embeddings, mock_generator = mock_embedding_setup
 
     with patch(
         'awslabs.git_repo_research_mcp_server.embeddings.BedrockEmbeddings'
     ) as mock_bedrock:
         # Configure the mock
-        mock_embeddings = MagicMock()
-        mock_embeddings.embed_query.return_value = [0.1] * 1536
-        mock_embeddings.embed_documents.side_effect = mock_embed_documents
         mock_bedrock.return_value = mock_embeddings
 
         # Use unique names for the repositories
@@ -457,25 +467,22 @@ async def test_list_repositories(test_context, test_git_repo, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_access_file_or_directory(test_context, test_git_repo, monkeypatch):
+async def test_access_file_or_directory(
+    test_context, test_git_repo, monkeypatch, mock_embedding_setup
+):
     """Test accessing files and directories."""
-
-    def mock_embed_documents(docs):
-        return [[0.1] * 1536 for _ in range(len(docs))]
+    mock_embeddings, mock_generator = mock_embedding_setup
 
     with patch(
         'awslabs.git_repo_research_mcp_server.embeddings.BedrockEmbeddings'
     ) as mock_bedrock:
         # Configure the mock
-        mock_embeddings = MagicMock()
-        mock_embeddings.embed_query.return_value = [0.1] * 1536
-        mock_embeddings.embed_documents.side_effect = mock_embed_documents
         mock_bedrock.return_value = mock_embeddings
 
         with patch(
             'awslabs.git_repo_research_mcp_server.indexer.get_embedding_generator'
         ) as mock_get_embedding:
-            mock_get_embedding.return_value.bedrock_embeddings = mock_embeddings
+            mock_get_embedding.return_value = mock_generator
 
         # Use a unique name for the repository
         repo_name = f'test_repo_{os.path.basename(test_git_repo)}'
@@ -531,25 +538,22 @@ async def test_access_file_or_directory(test_context, test_git_repo, monkeypatch
 
 
 @pytest.mark.asyncio
-async def test_mcp_delete_repository(test_context, test_git_repo, monkeypatch):
+async def test_mcp_delete_repository(
+    test_context, test_git_repo, monkeypatch, mock_embedding_setup
+):
     """Test deleting a repository."""
-
-    def mock_embed_documents(docs):
-        return [[0.1] * 1536 for _ in range(len(docs))]
+    mock_embeddings, mock_generator = mock_embedding_setup
 
     with patch(
         'awslabs.git_repo_research_mcp_server.embeddings.BedrockEmbeddings'
     ) as mock_bedrock:
         # Configure the mock
-        mock_embeddings = MagicMock()
-        mock_embeddings.embed_query.return_value = [0.1] * 1536
-        mock_embeddings.embed_documents.side_effect = mock_embed_documents
         mock_bedrock.return_value = mock_embeddings
 
         with patch(
             'awslabs.git_repo_research_mcp_server.indexer.get_embedding_generator'
         ) as mock_get_embedding:
-            mock_get_embedding.return_value.bedrock_embeddings = mock_embeddings
+            mock_get_embedding.return_value = mock_generator
 
         # Use a unique name for the repository
         repo_name = f'test_repo_{os.path.basename(test_git_repo)}'

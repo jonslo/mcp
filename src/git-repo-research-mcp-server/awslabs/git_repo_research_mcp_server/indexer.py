@@ -429,7 +429,7 @@ class RepositoryIndexer:
             # Process the repository to get text chunks
             if ctx:
                 await ctx.info('Processing repository files...')
-                await ctx.report_progress(10, 100)  # 10% progress - starting file processing
+                await ctx.report_progress(10, 100)
 
             chunks, chunk_to_file, extension_stats = process_repository(
                 repo_path,
@@ -440,13 +440,13 @@ class RepositoryIndexer:
             )
 
             if ctx:
-                await ctx.report_progress(30, 100)  # 30% progress - files processed
+                await ctx.report_progress(30, 100)
 
             if not chunks:
                 logger.warning('No text chunks found in repository')
                 if ctx:
                     await ctx.info('No text chunks found in repository')
-                    await ctx.report_progress(100, 100)  # Complete the progress
+                    await ctx.report_progress(100, 100)
                 return IndexRepositoryResponse(
                     status='error',
                     repository_name=repository_name,
@@ -463,17 +463,10 @@ class RepositoryIndexer:
             # Convert chunks to LangChain Document objects
             if ctx:
                 await ctx.info(f'Converting {len(chunks)} chunks to Document objects...')
-                await ctx.report_progress(40, 100)  # 40% progress - starting document creation
+                await ctx.report_progress(40, 100)
 
             documents = []
-            total_chunks = len(chunks)
             for i, chunk in enumerate(chunks):
-                if (
-                    ctx and i % max(1, total_chunks // 10) == 0
-                ):  # Report progress every ~10% of chunks
-                    progress = 40 + int((i / total_chunks) * 20)  # Progress from 40% to 60%
-                    await ctx.report_progress(progress, 100)
-
                 file_path = chunk_to_file.get(chunk, 'unknown')
                 documents.append(
                     Document(
@@ -481,6 +474,7 @@ class RepositoryIndexer:
                         metadata={'source': file_path, 'chunk_id': i},
                     )
                 )
+
             logger.debug(f'Number of documents to embed: {len(documents)}')
             logger.debug(
                 f'Embedding function type: {type(self.embedding_generator.bedrock_embeddings)}'
@@ -542,61 +536,53 @@ class RepositoryIndexer:
 
             logger.info(f'Copied {copied_files} files to {repo_files_path}')
 
-            # Create FAISS index using LangChain
             logger.info('Creating FAISS index with LangChain')
             if ctx:
                 await ctx.info('Creating FAISS index...')
-                await ctx.report_progress(70, 100)  # 70% progress - starting index creation
-            logger.debug(f'Created {len(documents)} documents')
+                await ctx.report_progress(70, 100)
 
             embedding_function = self.embedding_generator.bedrock_embeddings
             logger.debug(f'Using embedding function: {embedding_function}')
 
-            # Debug: Print document count and first document
-            logger.info(f'Document count: {len(documents)}')
-            if documents:
-                logger.info(f'First document content: {documents[0].page_content[:100]}...')
-                logger.info(f'First document metadata: {documents[0].metadata}')
-                try:
-                    test_embedding = self.embedding_generator.bedrock_embeddings.embed_documents(
-                        [documents[0].page_content]
-                    )
-                    logger.debug(f'Test embedding successful, length: {len(test_embedding)}')
-                except Exception as e:
-                    logger.error(f'Test embedding failed: {e}')
-                    raise
-
-            # Create the FAISS index
-            logger.info('Creating FAISS vector store from documents')
-            embedding_function = self.embedding_generator.bedrock_embeddings
-            logger.debug(f'Using embedding function: {embedding_function}')
+            # Test the embedding function
+            try:
+                logger.info('Testing embedding function on sample document...')
+                test_content = documents[0].page_content if documents else 'Test content'
+                test_result = embedding_function.embed_documents([test_content])
+                logger.info(
+                    f'Test embedding successful - shape: {len(test_result)}x{len(test_result[0])}'
+                )
+            except Exception as e:
+                logger.error(f'Embedding function test failed: {e}')
+                raise
 
             if ctx:
                 await ctx.info('Generating embeddings and creating vector store...')
-                await ctx.report_progress(75, 100)  # 75% progress - creating vector store
+                await ctx.report_progress(75, 100)
 
             logger.debug(f'Number of documents: {len(documents)}')
-            logger.debug(f'Embedding function: {self.embedding_generator.bedrock_embeddings}')
 
-            vector_store = FAISS.from_documents(
-                documents=documents,
-                embedding=embedding_function,
-            )
-
-            logger.debug(
-                f'Created vector store with {get_docstore_dict_size(vector_store.docstore)} documents'
-            )
-
-            # Debug: Print vector store info
-            logger.info(
-                f'Vector store created with {get_docstore_dict_size(vector_store.docstore)} documents'
-            )
+            # Create the FAISS vector store with error handling
+            try:
+                vector_store = FAISS.from_documents(
+                    documents=documents, embedding=embedding_function, normalize_L2=True
+                )
+                logger.debug(
+                    f'Created vector store with {get_docstore_dict_size(vector_store.docstore)} documents'
+                )
+            except Exception as e:
+                logger.error(f'Error creating vector store: {e}')
+                logger.error(f'Document count: {len(documents)}')
+                logger.error(
+                    f'First document content: {documents[0].page_content[:100] if documents else "None"}'
+                )
+                raise
 
             # Save the index without pickle
             logger.info(f'Saving index to {index_path}')
             if ctx:
                 await ctx.info(f'Saving index to {index_path}')
-                await ctx.report_progress(85, 100)  # 85% progress - saving index
+                await ctx.report_progress(85, 100)
 
             save_index_without_pickle(vector_store, index_path)
 
