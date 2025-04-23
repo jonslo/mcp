@@ -477,7 +477,7 @@ class RepositoryIndexer:
 
             logger.debug(f'Number of documents to embed: {len(documents)}')
             logger.debug(
-                f'Embedding function type: {type(self.embedding_generator.bedrock_embeddings)}'
+                f'Embedding function type: {type(self.embedding_generator)}'
             )
 
             # Determine the output path
@@ -541,7 +541,7 @@ class RepositoryIndexer:
                 await ctx.info('Creating FAISS index...')
                 await ctx.report_progress(70, 100)
 
-            embedding_function = self.embedding_generator.bedrock_embeddings
+            embedding_function = self.embedding_generator
             logger.debug(f'Using embedding function: {embedding_function}')
 
             # Test the embedding function
@@ -817,7 +817,7 @@ class RepositoryIndexer:
 
         try:
             # Load the LangChain FAISS index without pickle
-            embedding_function = self.embedding_generator.bedrock_embeddings
+            embedding_function = self.embedding_generator
             logger.info(f'Loading FAISS index with embedding function: {embedding_function}')
 
             try:
