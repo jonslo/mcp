@@ -17,7 +17,11 @@ This MCP server enables developers to research external Git repositories and inf
 ### Installation Requirements
 
 1. Install `uv` from [Astral](https://docs.astral.sh/uv/getting-started/installation/) or the [GitHub README](https://github.com/astral-sh/uv#installation)
-2. Install Python 3.13 or newer using `uv python install 3.13`
+2. Install Python 3.12 or newer using `uv python install 3.12`
+3. - [uv](https://github.com/astral-sh/uv) - Fast Python package installer and resolver
+4. AWS credentials configured with Bedrock access
+5. Node.js (for UVX installation support)
+
 
 ### AWS Requirements
 
@@ -141,7 +145,7 @@ List all indexed repositories from a specific index directory.
 repositories:///path/to/custom/index/directory
 ```
 
-## Limitations
+## Considerations
 
 - Repository indexing requires AWS Bedrock access and sufficient permissions
 - Large repositories may take significant time to index
