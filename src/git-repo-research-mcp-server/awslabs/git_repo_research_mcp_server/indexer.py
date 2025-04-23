@@ -363,7 +363,7 @@ class RepositoryIndexer:
                 repo_path = config.repository_path
 
             # Get the repository name
-            repository_name = get_repository_name(repo_path)
+            repository_name = get_repository_name(config.repository_path)
             logger.info(f'Indexing repository: {repository_name}')
             if ctx:
                 await ctx.info(f'Indexing repository: {repository_name}')
@@ -393,7 +393,7 @@ class RepositoryIndexer:
                 return IndexRepositoryResponse(
                     status='error',
                     repository_name=repository_name,
-                    repository_path=repository_path,
+                    repository_path=config.repository_path,
                     index_path='',
                     repository_directory=repo_path,
                     file_count=0,
@@ -426,9 +426,9 @@ class RepositoryIndexer:
                 )
 
             # Determine the output path
-            if output_path:
+            if config.output_path:
                 # Use output_path as the repository name and get the index path
-                index_path = self._get_index_path(output_path)
+                index_path = self._get_index_path(config.output_path)
                 # Ensure the directory exists
                 os.makedirs(index_path, exist_ok=True)
             else:
@@ -545,7 +545,7 @@ class RepositoryIndexer:
             # Get the last commit ID if it's a git repository
             # Do this before any cleanup to ensure we have access to the .git directory
             last_commit_id = None
-            if is_git_url(repository_path) or is_git_repo(repo_path):
+            if is_git_url(config.repository_path) or is_git_repo(repo_path):
                 logger.info(f'Attempting to get last commit ID for {repository_name}')
 
                 # Check if .git directory exists
@@ -579,11 +579,11 @@ class RepositoryIndexer:
                 await ctx.report_progress(90, 100)  # 90% progress - creating metadata
 
             # Use output_path as repository_name if provided
-            final_repo_name = output_path if output_path else repository_name
+            final_repo_name = config.output_path if config.output_path else repository_name
 
             metadata = IndexMetadata(
                 repository_name=final_repo_name,
-                repository_path=repository_path,
+                repository_path=config.repository_path,
                 index_path=index_path,
                 created_at=datetime.now(),
                 last_accessed=None,  # Explicitly set to None initially
@@ -636,7 +636,7 @@ class RepositoryIndexer:
             return IndexRepositoryResponse(
                 status='success',
                 repository_name=final_repo_name,
-                repository_path=repository_path,
+                repository_path=config.repository_path,
                 index_path=index_path,
                 repository_directory=repo_files_path,
                 file_count=metadata.file_count,
@@ -656,8 +656,8 @@ class RepositoryIndexer:
 
             return IndexRepositoryResponse(
                 status='error',
-                repository_name=get_repository_name(repository_path),
-                repository_path=repository_path,
+                repository_name=get_repository_name(config.repository_path),
+                repository_path=config.repository_path,
                 index_path='',
                 repository_directory=locals().get('repo_path'),
                 file_count=0,
