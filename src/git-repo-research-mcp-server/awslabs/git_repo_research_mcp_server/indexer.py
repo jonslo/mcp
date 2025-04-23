@@ -476,9 +476,7 @@ class RepositoryIndexer:
                 )
 
             logger.debug(f'Number of documents to embed: {len(documents)}')
-            logger.debug(
-                f'Embedding function type: {type(self.embedding_generator)}'
-            )
+            logger.debug(f'Embedding function type: {type(self.embedding_generator)}')
 
             # Determine the output path
             if config.output_path:
