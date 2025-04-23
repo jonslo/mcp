@@ -10,21 +10,15 @@
 # and limitations under the License.
 """Tests for the search functionality in Git Repository Research MCP Server."""
 
-import os
 import pytest
-import tempfile
-from unittest.mock import MagicMock, patch
-
+from awslabs.git_repo_research_mcp_server.models import (
+    SearchResponse,
+)
 from awslabs.git_repo_research_mcp_server.search import (
     RepositorySearcher,
     get_repository_searcher,
 )
-from awslabs.git_repo_research_mcp_server.models import (
-    Constants,
-    EmbeddingModel,
-    SearchResponse,
-    SearchResult,
-)
+from unittest.mock import MagicMock, patch
 
 
 class TestContext:
@@ -92,19 +86,24 @@ def test_get_repository_searcher():
 
 def test_repository_searcher_init():
     """Test the RepositorySearcher initialization."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator') as mock_get_embedding, \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer') as mock_get_indexer, \
-         patch('os.path.expanduser') as mock_expanduser:
-        
+    with (
+        patch(
+            'awslabs.git_repo_research_mcp_server.search.get_embedding_generator'
+        ) as mock_get_embedding,
+        patch(
+            'awslabs.git_repo_research_mcp_server.search.get_repository_indexer'
+        ) as mock_get_indexer,
+        patch('os.path.expanduser') as mock_expanduser,
+    ):
         # Configure the mocks
         mock_embedding = MagicMock()
         mock_get_embedding.return_value = mock_embedding
-        
+
         mock_indexer = MagicMock()
         mock_get_indexer.return_value = mock_indexer
-        
+
         mock_expanduser.return_value = '/home/user/.git_repo_research'
-        
+
         # Create a RepositorySearcher instance
         searcher = RepositorySearcher(
             embedding_model='test-model',
@@ -112,7 +111,7 @@ def test_repository_searcher_init():
             aws_profile='default',
             index_dir='/tmp/index',
         )
-        
+
         # Verify the initialization
         assert searcher.embedding_model == 'test-model'
         assert searcher.aws_region == 'us-west-2'
@@ -120,74 +119,78 @@ def test_repository_searcher_init():
         assert searcher.index_dir == '/tmp/index'
         assert searcher.embedding_generator == mock_embedding
         assert searcher.repository_indexer == mock_indexer
-        
+
         # Verify the mock calls
         mock_get_embedding.assert_called_once_with(
             model_id='test-model',
             aws_region='us-west-2',
             aws_profile='default',
         )
-        
+
         mock_get_indexer.assert_called_once()
 
 
 def test_list_repository_files_success():
     """Test the list_repository_files method with a successful case."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'), \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'), \
-         patch('os.path.exists') as mock_exists, \
-         patch('os.path.isdir') as mock_isdir, \
-         patch('os.listdir') as mock_listdir:
-        
+    with (
+        patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'),
+        patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'),
+        patch('os.path.exists') as mock_exists,
+        patch('os.path.isdir') as mock_isdir,
+        patch('os.listdir') as mock_listdir,
+    ):
         # Configure the mocks
         mock_indexer = MagicMock()
         mock_indexer._get_index_path.return_value = '/tmp/index/test_repo'
-        
+
         mock_exists.return_value = True
         mock_isdir.return_value = True
-        
+
         # Mock directory structure
         mock_listdir.side_effect = lambda path: {
             '/tmp/index/test_repo/repository': ['src', 'README.md'],
             '/tmp/index/test_repo/repository/src': ['main.py', 'utils.py'],
         }[path]
-        
+
         # Create a RepositorySearcher instance with the mock indexer
         searcher = RepositorySearcher()
         searcher.repository_indexer = mock_indexer
-        
+
         # Mock the _generate_directory_tree method
         searcher._generate_directory_tree = MagicMock(return_value='Directory tree')
-        
+
         # Call the method
         result = searcher.list_repository_files('test_repo')
-        
+
         # Verify the result
         assert result == 'Directory tree'
         mock_indexer._get_index_path.assert_called_once_with('test_repo')
-        searcher._generate_directory_tree.assert_called_once_with('/tmp/index/test_repo/repository')
+        searcher._generate_directory_tree.assert_called_once_with(
+            '/tmp/index/test_repo/repository'
+        )
 
 
 def test_list_repository_files_not_found():
     """Test the list_repository_files method when the repository is not found."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'), \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'), \
-         patch('os.path.exists') as mock_exists, \
-         patch('loguru.logger.warning') as mock_logger_warning:
-        
+    with (
+        patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'),
+        patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'),
+        patch('os.path.exists') as mock_exists,
+        patch('loguru.logger.warning') as mock_logger_warning,
+    ):
         # Configure the mocks
         mock_indexer = MagicMock()
         mock_indexer._get_index_path.return_value = '/tmp/index/test_repo'
-        
+
         mock_exists.return_value = False
-        
+
         # Create a RepositorySearcher instance with the mock indexer
         searcher = RepositorySearcher()
         searcher.repository_indexer = mock_indexer
-        
+
         # Call the method
         result = searcher.list_repository_files('test_repo')
-        
+
         # Verify the result
         assert result is None
         mock_indexer._get_index_path.assert_called_once_with('test_repo')
@@ -196,29 +199,30 @@ def test_list_repository_files_not_found():
 
 def test_list_repository_files_exception():
     """Test the list_repository_files method when an exception occurs."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'), \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'), \
-         patch('os.path.exists') as mock_exists, \
-         patch('os.path.isdir') as mock_isdir, \
-         patch('loguru.logger.error') as mock_logger_error:
-        
+    with (
+        patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'),
+        patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'),
+        patch('os.path.exists') as mock_exists,
+        patch('os.path.isdir') as mock_isdir,
+        patch('loguru.logger.error') as mock_logger_error,
+    ):
         # Configure the mocks
         mock_indexer = MagicMock()
         mock_indexer._get_index_path.return_value = '/tmp/index/test_repo'
-        
+
         mock_exists.return_value = True
         mock_isdir.return_value = True
-        
+
         # Create a RepositorySearcher instance with the mock indexer
         searcher = RepositorySearcher()
         searcher.repository_indexer = mock_indexer
-        
+
         # Mock the _generate_directory_tree method to raise an exception
         searcher._generate_directory_tree = MagicMock(side_effect=Exception('Test exception'))
-        
+
         # Call the method
         result = searcher.list_repository_files('test_repo')
-        
+
         # Verify the result
         assert result is None
         mock_indexer._get_index_path.assert_called_once_with('test_repo')
@@ -227,22 +231,23 @@ def test_list_repository_files_exception():
 
 def test_generate_directory_tree():
     """Test the _generate_directory_tree method."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'), \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'), \
-         patch('os.path.basename') as mock_basename:
-        
+    with (
+        patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'),
+        patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'),
+        patch('os.path.basename') as mock_basename,
+    ):
         # Configure the mocks
         mock_basename.return_value = 'test_repo'
-        
+
         # Create a RepositorySearcher instance
         searcher = RepositorySearcher()
-        
+
         # Mock the _generate_tree method
         searcher._generate_tree = MagicMock(return_value='    └── file.txt\n')
-        
+
         # Call the method
         result = searcher._generate_directory_tree('/tmp/index/test_repo')
-        
+
         # Verify the result
         assert result == 'Directory structure:\n└── test_repo/\n    └── file.txt\n'
         mock_basename.assert_called_once_with('/tmp/index/test_repo')
@@ -251,27 +256,30 @@ def test_generate_directory_tree():
 
 def test_generate_tree():
     """Test the _generate_tree method."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'), \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'), \
-         patch('os.listdir') as mock_listdir, \
-         patch('os.path.isdir') as mock_isdir:
-        
+    with (
+        patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'),
+        patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'),
+        patch('os.listdir') as mock_listdir,
+        patch('os.path.isdir') as mock_isdir,
+    ):
         # Configure the mocks
         mock_listdir.return_value = ['file.txt', 'dir', '.hidden']
         mock_isdir.side_effect = lambda path: path.endswith('/dir')
-        
+
         # Create a RepositorySearcher instance
         searcher = RepositorySearcher()
-        
+
         # Mock recursive call to _generate_tree
         original_generate_tree = searcher._generate_tree
-        searcher._generate_tree = MagicMock(side_effect=lambda path, prefix, base_path: 
-                                           '    └── subfile.txt\n' if path.endswith('/dir') else 
-                                           original_generate_tree(path, prefix, base_path))
-        
+        searcher._generate_tree = MagicMock(
+            side_effect=lambda path, prefix, base_path: '    └── subfile.txt\n'
+            if path.endswith('/dir')
+            else original_generate_tree(path, prefix, base_path)
+        )
+
         # Call the method
         result = searcher._generate_tree('/tmp/repo', '', 'repo')
-        
+
         # Verify the result
         expected = '    ├── dir/\n    └── file.txt\n'
         assert result == expected
@@ -279,46 +287,47 @@ def test_generate_tree():
 
 def test_search_with_repository_name():
     """Test the search method with a repository name."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'), \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'), \
-         patch('os.path.exists') as mock_exists, \
-         patch('os.path.isdir') as mock_isdir, \
-         patch('time.time') as mock_time, \
-         patch('loguru.logger.info') as mock_logger_info:
-        
+    with (
+        patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'),
+        patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'),
+        patch('os.path.exists') as mock_exists,
+        patch('os.path.isdir') as mock_isdir,
+        patch('time.time') as mock_time,
+        patch('loguru.logger.info') as mock_logger_info,
+    ):
         # Configure the mocks
         mock_time.side_effect = [1000.0, 1001.0]  # Start and end times
         mock_exists.return_value = False  # Not a directory path
         mock_isdir.return_value = True
-        
+
         mock_indexer = MagicMock()
         mock_indexer._get_index_path.return_value = '/tmp/index/test_repo'
-        
+
         # Create mock vector store and chunk map
         mock_vector_store = MagicMock()
         mock_chunk_map = {}
-        
+
         # Configure the mock vector store to return search results
         mock_doc1 = MagicMock()
         mock_doc1.page_content = 'Test content 1'
         mock_doc1.metadata = {'source': '/path/to/file1.txt', 'chunk_id': 1}
-        
+
         mock_doc2 = MagicMock()
         mock_doc2.page_content = 'Test content 2'
         mock_doc2.metadata = {'source': '/path/to/file2.txt', 'chunk_id': 2}
-        
+
         mock_vector_store.similarity_search.return_value = [mock_doc1, mock_doc2]
         mock_vector_store.docstore._dict = {1: mock_doc1, 2: mock_doc2}
-        
+
         mock_indexer.load_index.return_value = (mock_vector_store, mock_chunk_map)
-        
+
         # Create a RepositorySearcher instance with the mock indexer
         searcher = RepositorySearcher()
         searcher.repository_indexer = mock_indexer
-        
+
         # Call the method
         result = searcher.search('test_repo', 'test query', limit=10, threshold=0.0)
-        
+
         # Verify the result
         assert isinstance(result, SearchResponse)
         assert result.query == 'test query'
@@ -327,18 +336,18 @@ def test_search_with_repository_name():
         assert result.repository_directory == '/tmp/index/test_repo/repository'
         assert result.total_results == 2
         assert result.execution_time_ms == 1000
-        
+
         assert len(result.results) == 2
         assert result.results[0].file_path == '/path/to/file1.txt'
         assert result.results[0].content == 'Test content 1'
         assert result.results[0].score == 1.0
         assert result.results[0].metadata['chunk_id'] == '1'
-        
+
         assert result.results[1].file_path == '/path/to/file2.txt'
         assert result.results[1].content == 'Test content 2'
         assert result.results[1].score == 1.0
         assert result.results[1].metadata['chunk_id'] == '2'
-        
+
         # Verify the mock calls
         mock_indexer._get_index_path.assert_called_once_with('test_repo')
         mock_indexer.load_index.assert_called_once_with('test_repo')
@@ -347,43 +356,44 @@ def test_search_with_repository_name():
 
 def test_search_with_directory_path():
     """Test the search method with a directory path."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'), \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'), \
-         patch('os.path.exists') as mock_exists, \
-         patch('os.path.isdir') as mock_isdir, \
-         patch('os.path.basename') as mock_basename, \
-         patch('time.time') as mock_time, \
-         patch('loguru.logger.info') as mock_logger_info:
-        
+    with (
+        patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'),
+        patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'),
+        patch('os.path.exists') as mock_exists,
+        patch('os.path.isdir') as mock_isdir,
+        patch('os.path.basename') as mock_basename,
+        patch('time.time') as mock_time,
+        patch('loguru.logger.info') as mock_logger_info,
+    ):
         # Configure the mocks
         mock_time.side_effect = [1000.0, 1001.0]  # Start and end times
         mock_exists.return_value = True  # It's a directory path
         mock_isdir.return_value = True
         mock_basename.return_value = 'test_repo'
-        
+
         mock_indexer = MagicMock()
-        
+
         # Create mock vector store and chunk map
         mock_vector_store = MagicMock()
         mock_chunk_map = {}
-        
+
         # Configure the mock vector store to return search results
         mock_doc1 = MagicMock()
         mock_doc1.page_content = 'Test content 1'
         mock_doc1.metadata = {'source': '/path/to/file1.txt', 'chunk_id': 1}
-        
+
         mock_vector_store.similarity_search.return_value = [mock_doc1]
         mock_vector_store.docstore._dict = {1: mock_doc1}
-        
+
         mock_indexer.load_index.return_value = (mock_vector_store, mock_chunk_map)
-        
+
         # Create a RepositorySearcher instance with the mock indexer
         searcher = RepositorySearcher()
         searcher.repository_indexer = mock_indexer
-        
+
         # Call the method
         result = searcher.search('/tmp/index/test_repo', 'test query', limit=10, threshold=0.0)
-        
+
         # Verify the result
         assert isinstance(result, SearchResponse)
         assert result.query == 'test query'
@@ -392,58 +402,59 @@ def test_search_with_directory_path():
         assert result.repository_directory == '/tmp/index/test_repo/repository'
         assert result.total_results == 1
         assert result.execution_time_ms == 1000
-        
+
         assert len(result.results) == 1
         assert result.results[0].file_path == '/path/to/file1.txt'
         assert result.results[0].content == 'Test content 1'
         assert result.results[0].score == 1.0
         assert result.results[0].metadata['chunk_id'] == '1'
-        
+
         # Verify the mock calls
         mock_indexer.load_index.assert_called_once_with('test_repo')
 
 
 def test_search_with_similarity_search_with_score_fallback():
     """Test the search method with similarity_search_with_score fallback."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'), \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'), \
-         patch('os.path.exists') as mock_exists, \
-         patch('os.path.isdir') as mock_isdir, \
-         patch('time.time') as mock_time, \
-         patch('loguru.logger.info') as mock_logger_info, \
-         patch('loguru.logger.error') as mock_logger_error:
-        
+    with (
+        patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'),
+        patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'),
+        patch('os.path.exists') as mock_exists,
+        patch('os.path.isdir') as mock_isdir,
+        patch('time.time') as mock_time,
+        patch('loguru.logger.info') as mock_logger_info,
+        patch('loguru.logger.error') as mock_logger_error,
+    ):
         # Configure the mocks
         mock_time.side_effect = [1000.0, 1001.0]  # Start and end times
         mock_exists.return_value = False  # Not a directory path
         mock_isdir.return_value = True
-        
+
         mock_indexer = MagicMock()
         mock_indexer._get_index_path.return_value = '/tmp/index/test_repo'
-        
+
         # Create mock vector store and chunk map
         mock_vector_store = MagicMock()
         mock_chunk_map = {}
-        
+
         # Configure the mock vector store to fail with similarity_search but succeed with similarity_search_with_score
         mock_vector_store.similarity_search.side_effect = Exception('Test exception')
-        
+
         mock_doc1 = MagicMock()
         mock_doc1.page_content = 'Test content 1'
         mock_doc1.metadata = {'source': '/path/to/file1.txt', 'chunk_id': 1}
-        
+
         mock_vector_store.similarity_search_with_score.return_value = [(mock_doc1, 0.5)]
         mock_vector_store.docstore._dict = {1: mock_doc1}
-        
+
         mock_indexer.load_index.return_value = (mock_vector_store, mock_chunk_map)
-        
+
         # Create a RepositorySearcher instance with the mock indexer
         searcher = RepositorySearcher()
         searcher.repository_indexer = mock_indexer
-        
+
         # Call the method
         result = searcher.search('test_repo', 'test query', limit=10, threshold=0.0)
-        
+
         # Verify the result
         assert isinstance(result, SearchResponse)
         assert result.query == 'test query'
@@ -452,14 +463,14 @@ def test_search_with_similarity_search_with_score_fallback():
         assert result.repository_directory == '/tmp/index/test_repo/repository'
         assert result.total_results == 1
         assert result.execution_time_ms == 1000
-        
+
         assert len(result.results) == 1
         assert result.results[0].file_path == '/path/to/file1.txt'
         assert result.results[0].content == 'Test content 1'
         assert result.results[0].score == 0.75  # 1.0 - min(1.0, 0.5/2.0)
         assert result.results[0].metadata['chunk_id'] == '1'
         assert result.results[0].metadata['distance'] == '0.5'
-        
+
         # Verify the mock calls
         mock_indexer._get_index_path.assert_called_once_with('test_repo')
         mock_indexer.load_index.assert_called_once_with('test_repo')
@@ -470,40 +481,41 @@ def test_search_with_similarity_search_with_score_fallback():
 
 def test_search_with_both_search_methods_failing():
     """Test the search method when both similarity search methods fail."""
-    with patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'), \
-         patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'), \
-         patch('os.path.exists') as mock_exists, \
-         patch('os.path.isdir') as mock_isdir, \
-         patch('time.time') as mock_time, \
-         patch('loguru.logger.info') as mock_logger_info, \
-         patch('loguru.logger.error') as mock_logger_error:
-        
+    with (
+        patch('awslabs.git_repo_research_mcp_server.search.get_embedding_generator'),
+        patch('awslabs.git_repo_research_mcp_server.search.get_repository_indexer'),
+        patch('os.path.exists') as mock_exists,
+        patch('os.path.isdir') as mock_isdir,
+        patch('time.time') as mock_time,
+        patch('loguru.logger.info') as mock_logger_info,
+        patch('loguru.logger.error') as mock_logger_error,
+    ):
         # Configure the mocks
         mock_time.side_effect = [1000.0, 1001.0]  # Start and end times
         mock_exists.return_value = False  # Not a directory path
         mock_isdir.return_value = True
-        
+
         mock_indexer = MagicMock()
         mock_indexer._get_index_path.return_value = '/tmp/index/test_repo'
-        
+
         # Create mock vector store and chunk map
         mock_vector_store = MagicMock()
         mock_chunk_map = {}
-        
+
         # Configure the mock vector store to fail with both search methods
         mock_vector_store.similarity_search.side_effect = Exception('Test exception 1')
         mock_vector_store.similarity_search_with_score.side_effect = Exception('Test exception 2')
         mock_vector_store.docstore._dict = {1: MagicMock()}
-        
+
         mock_indexer.load_index.return_value = (mock_vector_store, mock_chunk_map)
-        
+
         # Create a RepositorySearcher instance with the mock indexer
         searcher = RepositorySearcher()
         searcher.repository_indexer = mock_indexer
-        
+
         # Call the method
         result = searcher.search('test_repo', 'test query', limit=10, threshold=0.0)
-        
+
         # Verify the result
         assert isinstance(result, SearchResponse)
         assert result.query == 'test query'
@@ -513,6 +525,6 @@ def test_search_with_both_search_methods_failing():
         assert result.total_results == 0
         assert result.execution_time_ms == 1000
         assert len(result.results) == 0
-        
+
         # Verify the mock calls
         mock_indexer._get_index_path.assert_called_once_with('test_repo')
