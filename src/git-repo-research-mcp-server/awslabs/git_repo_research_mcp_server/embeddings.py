@@ -11,7 +11,7 @@
 """Embeddings generation for Git Repository Research MCP Server.
 
 This module provides functionality for generating embeddings from text
-using AWS Bedrock models via LangChain.
+using Amazon Bedrock models via LangChain.
 """
 
 import os

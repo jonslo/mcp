@@ -2,7 +2,7 @@
 
 Model Context Protocol (MCP) server for researching Git repositories using semantic search
 
-This MCP server enables developers to research external Git repositories and influence their code generation without having to clone repositories to local projects. It provides tools to index, search, and explore Git repositories using semantic search powered by AWS Bedrock and FAISS.
+This MCP server enables developers to research external Git repositories and influence their code generation without having to clone repositories to local projects. It provides tools to index, search, and explore Git repositories using semantic search powered by Amazon Bedrock and FAISS.
 
 ## Features
 
@@ -25,8 +25,8 @@ This MCP server enables developers to research external Git repositories and inf
 
 ### AWS Requirements
 
-1. **AWS CLI Configuration**: You must have the AWS CLI configured with credentials that have access to AWS Bedrock
-2. **AWS Bedrock Access**: Ensure your AWS account has access to embedding models like Titan Embeddings
+1. **AWS CLI Configuration**: You must have the AWS CLI configured with credentials that have access to Amazon Bedrock
+2. **Amazon Bedrock Access**: Ensure your AWS account has access to embedding models like Titan Embeddings
 3. **Environment Variables**: The server uses `AWS_REGION` and `AWS_PROFILE` environment variables
 
 ### Optional Requirements
@@ -60,7 +60,7 @@ To add this MCP server to your Amazon Q or Claude, add the following to your MCP
 
 ### create_research_repository
 
-Indexes a Git repository (local or remote) using FAISS and AWS Bedrock embeddings.
+Indexes a Git repository (local or remote) using FAISS and Amazon Bedrock embeddings.
 
 ```python
 create_research_repository(
@@ -147,7 +147,7 @@ repositories:///path/to/custom/index/directory
 
 ## Considerations
 
-- Repository indexing requires AWS Bedrock access and sufficient permissions
+- Repository indexing requires Amazon Bedrock access and sufficient permissions
 - Large repositories may take significant time to index
 - Binary files (except images) are not supported for content viewing
 - GitHub repository search is by default limited to AWS organizations: aws-samples, aws-solutions-library-samples, and awslabs (but can be configured to include other organizations)

@@ -198,7 +198,7 @@ async def mcp_index_repository(
 ) -> Dict:
     """Build a FAISS index for a Git repository.
 
-    This tool indexes a Git repository (local or remote) using FAISS and AWS Bedrock embeddings.
+    This tool indexes a Git repository (local or remote) using FAISS and Amazon Bedrock embeddings.
     The index can then be used for semantic search within the repository.
 
     Args:
@@ -626,7 +626,7 @@ async def mcp_search_repository(
 ) -> Dict:
     """Perform semantic search within an indexed repository.
 
-    This tool searches an indexed repository using semantic search with AWS Bedrock embeddings.
+    This tool searches an indexed repository using semantic search with Amazon Bedrock embeddings.
     It returns results ranked by relevance to the query.
 
     Args:
