@@ -29,11 +29,6 @@ class GitHubConfig(BaseModel):
     )
 
 
-class Constants:
-    """Constants used throughout the Git Repository Research MCP Server."""
-
-    DEFAULT_INDEX_DIR = '.git_repo_research'
-
 
 class IndexMetadata(BaseModel):
     """Metadata for a repository index.

@@ -20,8 +20,8 @@ import os
 import shutil
 import time
 from awslabs.git_repo_research_mcp_server.embeddings import get_embedding_generator
+from awslabs.git_repo_research_mcp_server.defaults import Constants
 from awslabs.git_repo_research_mcp_server.models import (
-    Constants,
     EmbeddingModel,
     IndexMetadata,
     IndexRepositoryResponse,
